@@ -2,13 +2,15 @@ var roleHarvester = require('role.harvester');
 var roleUpgrader = require('role.upgrader');
 var roleBuilder = require('role.builder');
 
-var MaxHarv = 4;
-var MaxBuild = 3;
-var MaxUpgrade = 2;
+var MaxHarv = 2;
+var MaxBuild = 2;
+var MaxUpgrade = 3;
 
 var MaxCreeps = MaxHarv + MaxBuild + MaxUpgrade;
 
 var Worker = [WORK,WORK,WORK,CARRY,MOVE,MOVE]
+
+var lastsource = 0;
 
 
 module.exports.loop = function () {
@@ -21,11 +23,14 @@ module.exports.loop = function () {
         site.remove();
     }
 */
+
     for(var name in Memory.creeps) {
         if(!Game.creeps[name]) {
             delete Memory.creeps[name];
             console.log('Clearing non-existing creep memory:', name);
         }
+        
+        
     }
 
     var upgraders = _.filter(Game.creeps, (creep) => creep.memory.role == 'upgrader');
@@ -37,6 +42,8 @@ module.exports.loop = function () {
     var harvesters = _.filter(Game.creeps, (creep) => creep.memory.role == 'harvester');
     console.log('Harvesters: ' + harvesters.length);
     TotalCreeps = upgraders.length + builders.length + harvesters.length;
+    
+    
     
     console.log('TotalCreeps: ' + TotalCreeps);
 //These need to be adjusted at the start of a room to WORK,CARRY,MOVE
