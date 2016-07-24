@@ -61,6 +61,18 @@ var roleBuilder = {
             
 	    }
 	    else {
+	        var strucs = creep.room.find(FIND_STRUCTURES);
+	        
+	        for (var i in strucs)
+	        {
+	            if (strucs[i].hits < (strucs[i].hitsMax/2))
+	            {
+	                if (creep.repair(strucs[i]) == ERR_NOT_IN_RANGE)
+	                {
+	                    creep.moveTo(strucs[i]);
+	                }
+	            }
+	        }
 	        var sources =  creep.room.find(FIND_SOURCES);
             var len = sources.length;
             if (!creep.memory.hasOwnProperty("mysource")) {
