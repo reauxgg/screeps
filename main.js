@@ -81,15 +81,25 @@ module.exports.loop = function () {
     }
 
 //Tower defense
-    function defendRoom(roomName) {
-        var hostiles = Game.rooms[roomName].find(FIND_HOSTILE_CREEPS);
-        if(hostiles.length > 0) {
-            var username = hostiles[0].owner.username;
-            Game.notify(`User ${username} spotted in room ${roomName}`);
-            var towers = Game.rooms[roomName].find(
-                FIND_MY_STRUCTURES, {filter: {structureType: STRUCTURE_TOWER
-                }});
-            towers.forEach(tower => tower.attack(hostiles[0]));
+
+    var towers = Room.find(FIND_STRUCTURES, {
+        filter: (s) => s.structureType == STRUCTURE_TOWER
+    });
+    for (let tower of towers) {
+        var target = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+        if (target != undefined) {
+            tower.attack(target);
+            Game.notify("Tower has spotted enemies!")
+        }
+        else {
+// Turn on tower healing?
+            var closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
+                filter: (structure) => structure.structureType == STRUCTURE_WALL && structure.hits < 125000 && structure.hits != structure.hitsMax
+            });
+            if(closestDamagedStructure && tower.energy > 700) {
+                tower.repair(closestDamagedStructure);
+            }
+// Turn off healing
         }
     }
 
