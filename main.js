@@ -3,7 +3,7 @@ var hCap = 3;
 var bCap = 2;
 var rCap = 2;
 var uCap = 4;
-var body = [WORK, WORK,CARRY, CARRY, CARRY, MOVE, MOVE];
+var body = [WORK, WORK,WORK,WORK,CARRY,CARRY, CARRY, CARRY, MOVE, MOVE,MOVE,MOVE];
 
 //The real stuff starts here.
 module.exports.loop = function () {
@@ -13,9 +13,9 @@ module.exports.loop = function () {
             console.log('Clearing non-existing creep memory:', name);
         }
     }
-    
-    var energystores = _.filter(Game.structures, (structure) => structure.structureType == STRUCTURE_EXTENSION || 
-                                                                structure.structureType == STRUCTURE_SPAWN || 
+
+    var energystores = _.filter(Game.structures, (structure) => structure.structureType == STRUCTURE_EXTENSION ||
+                                                                structure.structureType == STRUCTURE_SPAWN ||
                                                                 structure.structureType == STRUCTURE_TOWER ||
                                                                 structure.structureType == STRUCTURE_CONTAINER);
 
@@ -94,6 +94,3 @@ module.exports.loop = function () {
     }
 
 }
-
-
-
