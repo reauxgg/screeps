@@ -61,6 +61,7 @@ var roleBuilder = {
             
 	    }
 	    else {
+	   
 	        var sources =  creep.room.find(FIND_SOURCES);
             var len = sources.length;
             if (!creep.memory.hasOwnProperty("mysource")) {

@@ -2,42 +2,49 @@ var roleHarvester = require('role.harvester');
 var roleUpgrader = require('role.upgrader');
 var roleBuilder = require('role.builder');
 
-var MaxHarv = 4;
-var MaxBuild = 3;
-var MaxUpgrade = 2;
+var WorkerBody1 = [WORK, CARRY, MOVE];
+var WorkerBody2 = [WORK,WORK,WORK,CARRY,MOVE,MOVE];
 
-var MaxCreeps = MaxHarv + MaxBuild + MaxUpgrade;
+var CreepPref = ['harvester', 'builder', 'upgrader'];
+var CreepMin = ['harvester' : 1,
+                'builder'   : 1,
+                'upgrader'  : 1];
+var CreepMax = ['harvester' : 3,
+                'builder'   : 2,
+                'upgrader'  : 4];
 
-var Worker = [WORK,WORK,WORK,CARRY,MOVE,MOVE]
+var CreepCount ['harvester' : 0,
+                'builder'   : 0,
+                'upgrader'  : 0];
 
+var MaxCreeps = 0;
 
-module.exports.loop = function () {
-    
-    /*
-    for (var id in Game.constructionSites)
+for (key in CreepMax.keys())
+{
+  MaxCreeps += CreepMax[key];
+}
+
+module.exports.loop = function ()
+{
+  for (key in CreepCount.keys())
+  {
+    CreepCount = 0;
+  }
+    for(var name in Memory.creeps)
     {
-        var site = Game.constructionSites[id]
-        //console.log('Site: ' + site);
-        site.remove();
-    }
-*/
-    for(var name in Memory.creeps) {
-        if(!Game.creeps[name]) {
+        if(!Game.creeps[name])
+        {
             delete Memory.creeps[name];
             console.log('Clearing non-existing creep memory:', name);
         }
+        else
+        {
+          CreepCount[Memory.creeps[name].role] += 1
+        }
     }
 
-    var upgraders = _.filter(Game.creeps, (creep) => creep.memory.role == 'upgrader');
-    console.log('Upgraders: ' + upgraders.length);
+    TotalCreeps = Game.creeps.length;
 
-    var builders = _.filter(Game.creeps, (creep) => creep.memory.role == 'builder');
-    console.log('Builders: ' + builders.length);
-
-    var harvesters = _.filter(Game.creeps, (creep) => creep.memory.role == 'harvester');
-    console.log('Harvesters: ' + harvesters.length);
-    TotalCreeps = upgraders.length + builders.length + harvesters.length;
-    
     console.log('TotalCreeps: ' + TotalCreeps);
 //These need to be adjusted at the start of a room to WORK,CARRY,MOVE
     if (TotalCreeps < MaxCreeps)
@@ -55,7 +62,7 @@ module.exports.loop = function () {
                 if(builders.length < MaxBuild) {
                     var newName = Game.spawns['Spawn1'].createCreep(Worker, undefined, {role: 'builder', roleOriginal: 'builder'});
                     console.log('Spawning new builder: ' + newName);
-                
+
                 }
             }
         }
