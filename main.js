@@ -1,9 +1,13 @@
 // Adjust population caps here
-var hCap = 3;
-var bCap = 2;
-var rCap = 2;
-var uCap = 4;
-var body = [WORK, WORK,WORK,WORK,CARRY,CARRY, CARRY, CARRY, MOVE, MOVE,MOVE,MOVE];
+var hCap = 4;
+var bCap = 1;
+var rCap = 1;
+var uCap = 3;
+//var body = [WORK,CARRY,MOVE];
+var body = [WORK,WORK,WORK,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE];
+//var body = [WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE];
+var healer = [HEAL,HEAL,MOVE,MOVE,MOVE,MOVE];
+var fighter = [RANGED_ATTACK, RANGED_ATTACK, MOVE,MOVE,MOVE,MOVE];
 
 //The real stuff starts here.
 module.exports.loop = function () {
@@ -15,11 +19,9 @@ module.exports.loop = function () {
     }
 
     var energystores = _.filter(Game.structures, (structure) => structure.structureType == STRUCTURE_EXTENSION ||
-                                                                structure.structureType == STRUCTURE_SPAWN ||
-                                                                structure.structureType == STRUCTURE_TOWER ||
-                                                                structure.structureType == STRUCTURE_CONTAINER);
+                                                                structure.structureType == STRUCTURE_SPAWN);
 
-    TotalEnergy = 0;
+    var TotalEnergy = 0;
     for (var i in energystores)
     {
         TotalEnergy += energystores[i].energy;
@@ -96,7 +98,7 @@ module.exports.loop = function () {
             var closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
                 filter: (structure) => structure.structureType == STRUCTURE_WALL && structure.hits < 125000 && structure.hits != structure.hitsMax
             });
-            if(closestDamagedStructure && tower.energy > 700) {
+            if(closestDamagedStructure && tower.energy > 500) {
                 tower.repair(closestDamagedStructure);
             }
 // Turn off healing
