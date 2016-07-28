@@ -11,6 +11,12 @@ var CreepBody = {
     GetBody : function (MaxEnergy)
     {
         var Energy = 0;
+        var PartCount = 0;
+        var Body = [];
+        while (Energy < MaxEnergy)
+        {
+
+        }
     }
 };
 
