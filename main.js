@@ -1,3 +1,17 @@
+
+var roleHarvester = require('role.harvester');
+var roleUpgrader = require('role.upgrader');
+var roleBuilder = require('role.builder');
+var roleRepairer = require('role.repairer');
+
+function BuildCreep(type, level)
+{
+    var Bodies = CreepBodies[type];
+    var Body = Bodies[level];
+    return Game.spawns['Spawn1'].createCreep(Body, )
+}
+
+
 // Adjust population caps here
 var hCap = 4;
 var bCap = 1;
@@ -27,11 +41,7 @@ module.exports.loop = function () {
         TotalEnergy += energystores[i].energy;
     }
 
-    var Room=Game.spawns.Spawn1.room;
-    var roleHarvester = require('role.harvester');
-    var roleUpgrader = require('role.upgrader');
-    var roleBuilder = require('role.builder');
-    var roleRepairer = require('role.repairer');
+
 
     var harvesters = _.filter(Game.creeps, (creep) => creep.memory.role == 'harvester');
     var builders = _.filter(Game.creeps, (creep) => creep.memory.role == 'builder');

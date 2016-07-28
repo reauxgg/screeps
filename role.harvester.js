@@ -6,7 +6,7 @@ var roleHarvester = {
 
     /*
         if (creep.memory.roleOriginal)
-        { 
+        {
             if (creep.room.find(FIND_CONSTRUCTION_SITES))
             {
                 creep.memory.role = roleOriginal;
@@ -30,28 +30,32 @@ var roleHarvester = {
         }
 
         //If full energy, return energy to structures
-        else {
+        else
+        {
             var target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                filter: (structure) => {
-                    return (structure.structureType == STRUCTURE_EXTENSION || structure.structureType == STRUCTURE_SPAWN || (structure.structureType == STRUCTURE_TOWER && structure.energy < 300)) &&
-                    structure.energy < structure.energyCapacity;
-                    }
-                });
+                                                    filter: (structure) => {
+                                                        return (structure.structureType == STRUCTURE_EXTENSION ||
+                                                                structure.structureType == STRUCTURE_SPAWN ||
+                                                                (structure.structureType == STRUCTURE_TOWER &&
+                                                                    structure.energy < 300)) &&
+                                                                structure.energy < structure.energyCapacity;
+                                                            }
+                                                        });
             if (!target)
             {
-                var target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                filter: (structure) => {
-                    return (structure.structureType == STRUCTURE_TOWER) &&
-                    structure.energy < structure.energyCapacity;
-                    }
-                });
+                var target = creep.pos.findClosestByPath(FIND_STRUCTURES, {filter: (structure) => {
+                                                                return structure.structureType == STRUCTURE_TOWER &&
+                                                                        structure.energy < structure.energyCapacity;
+                                                                    }
+                                                                });
             }
-            else if (target == null) {
-                  var target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                    filter: (structure) => {
-                        return (structure.structureType == STRUCTURE_STORAGE) && structure.store[RESOURCE_ENERGY] < structure.storeCapacity;
-                    }
-                });
+            else if (target == null)
+            {
+                var target = creep.pos.findClosestByPath(FIND_STRUCTURES, { filter: (structure) => {
+                                                            return (structure.structureType == STRUCTURE_STORAGE)
+                                                                && structure.store[RESOURCE_ENERGY] < structure.storeCapacity;
+                                                            }
+                                                        });
                 if (target)
                 {
                     if (creep.transfer(target) == ERR_NOT_IN_RANGE)
@@ -60,7 +64,8 @@ var roleHarvester = {
                     }
                 }
             }
-            else {
+            else
+            {
                 /*if (!creep.memory.roleOriginal)
                 {
                     creep.memory.roleOriginal = 'harvester';
@@ -68,14 +73,14 @@ var roleHarvester = {
                 creep.memory.role = 'builder';
                 */
             }
-            
+
 // Move to closest energy container
 // console.log('Giving enrgy to: ' + target)
             if(creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(target);
             }
         }
-        
+
 	}
 };
 
