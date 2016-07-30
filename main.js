@@ -1,15 +1,8 @@
-
+var CreepBase = require('CreepBase');
 var roleHarvester = require('role.harvester');
 var roleUpgrader = require('role.upgrader');
 var roleBuilder = require('role.builder');
 var roleRepairer = require('role.repairer');
-
-function BuildCreep(type, level)
-{
-    var Bodies = CreepBodies[type];
-    var Body = Bodies[level];
-    return Game.spawns['Spawn1'].createCreep(Body, )
-}
 
 
 // Adjust population caps here

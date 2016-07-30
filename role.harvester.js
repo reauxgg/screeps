@@ -1,18 +1,10 @@
-var roleHarvester = {
 
-    /** @param {Creep} creep **/
+var roleHarvester = {
+    var Primary : 'harvester',
+    var Bodies : require('CreepBase.js'),
 
     run: function(creep) {
 
-    /*
-        if (creep.memory.roleOriginal)
-        {
-            if (creep.room.find(FIND_CONSTRUCTION_SITES))
-            {
-                creep.memory.role = roleOriginal;
-            }
-        }
-        */
         //Check for full energy
 	    if(creep.carry.energy == creep.carryCapacity) {
 	        creep.memory.return = true;
