@@ -31,10 +31,10 @@ var roleBuilder = {
 	    }
 	    else {
 	        var container = creep.pos.findClosestByPath(FIND_STRUCTURES, {filter : (structure) => {
-                        return (structure.structureType == STRUCTURE_CONTAINER)} });
+                        return (structure.structureType == STRUCTURE_STORAGE) && (structure.store[RESOURCE_ENERGY] >= creep.energyCapacity)} });
 	        if (container)
 	        {
-	            if (creep.dismantle(container) == ERR_NOT_IN_RANGE)
+	            if (creep.transfer(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE)
 	            {
 	                creep.moveTo(container);
 	            }
