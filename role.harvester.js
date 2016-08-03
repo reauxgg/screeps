@@ -21,12 +21,13 @@ Bodies[EnergyLevels.Level5] = [WORK,WORK,WORK,WORK,
 Bodies[EnergyLevels.Level6] = [WORK,WORK,WORK,WORK,
                                CARRY,CARRY,CARRY,CARRY,CARRY,
                                MOVE,MOVE,MOVE,MOVE,MOVE];
+
 var roleHarvester = {
-    GetBody : function (EnergyLevel)
+    GetBody : function (Level)
     {
-        for (key in keys(Bodies))
+        for (var key in Bodies.keys)
         {
-            if (EnergyLevel <= key)
+            if (Level <= key)
             {
                 return Bodies[key];
             }
@@ -36,10 +37,12 @@ var roleHarvester = {
     {
         creep.memory.role = CreepBase.Harvest;
     },
+
     AssignTarget : function (creep, objs)
     {
-        creep.memory.target = creep.room.pos.findClosestByPath(objs);
+        creep.memory.Target = creep.room.pos.findClosestByPath(objs);
     },
+
     CheckTarget : function (creep)
     {
         var target = creep.memory.Target;
@@ -47,7 +50,6 @@ var roleHarvester = {
         {
             case TaskHarvest:
                 return target.energy > 0;
-                break;
             case TaskStore:
                 try
                 {
@@ -61,7 +63,7 @@ var roleHarvester = {
             default:
                 return false;
         }
-    }
+    },
 
     Run: function(creep)
     {
@@ -105,7 +107,7 @@ var roleHarvester = {
         }
 
 	    //Get full energy, if needed
-	    if(creep.memory.return == false) {
+	    if(creep.memory.return === false) {
             var source = creep.pos.findClosestByPath(FIND_SOURCES);
             if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(source);
@@ -126,17 +128,17 @@ var roleHarvester = {
                                                         });
             if (!target)
             {
-                var target = creep.pos.findClosestByPath(FIND_STRUCTURES, {filter: (structure) => {
+                target = creep.pos.findClosestByPath(FIND_STRUCTURES, {filter: (structure) => {
                                                                 return structure.structureType == STRUCTURE_TOWER &&
                                                                         structure.energy < structure.energyCapacity;
                                                                     }
                                                                 });
             }
-            else if (target == null)
+            else if (target === null)
             {
-                var target = creep.pos.findClosestByPath(FIND_STRUCTURES, { filter: (structure) => {
-                                                            return (structure.structureType == STRUCTURE_STORAGE)
-                                                                && structure.store[RESOURCE_ENERGY] < structure.storeCapacity;
+                target = creep.pos.findClosestByPath(FIND_STRUCTURES, { filter: (structure) => {
+                                                            return (structure.structureType == STRUCTURE_STORAGE) &&
+                                                            structure.store[RESOURCE_ENERGY] < structure.storeCapacity;
                                                             }
                                                         });
                 if (target)
@@ -165,6 +167,7 @@ var roleHarvester = {
         }
 
 	}
+
 };
 
 module.exports = roleHarvester;

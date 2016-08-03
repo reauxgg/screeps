@@ -19,7 +19,7 @@ var CreepBase = {
         Level6 : 2300,
         Level7 : 5300,
         Level8 : 12300
-    };
+    },
 
     GetHarvestTargets : function(creep) {
         var Active = creep.room.find(FIND_SOURCES_ACTIVE);
@@ -44,6 +44,7 @@ var CreepBase = {
     GetBuildTargets : function (creep) {
         return creep.room.find(FIND_CONSTRUCTION_SITES);
     },
+
     GetRepairTargets : function (creep) {
         return creep.room.find(FIND_STRUCTURES, {
                 filter : (obj) => {
@@ -51,6 +52,7 @@ var CreepBase = {
                 }
             });
     },
+
     GetUpgradeTargets : function (creep) {
         return creep.room.controller;
     },
