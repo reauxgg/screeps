@@ -1,17 +1,15 @@
 var CreepBase = require('CreepBase');
-var roleHarvester = require('role.harvester');
-var roleUpgrader = require('role.upgrader');
-var roleBuilder = require('role.builder');
-var roleRepairer = require('role.repairer');
+var Harvester = require('role.harvester');
 
-
-// Adjust population caps here
 var hCap = 4;
 var bCap = 1;
 var rCap = 1;
 var uCap = 3;
-//var body = [WORK,CARRY,MOVE];
-var body = [WORK,WORK,WORK,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE];
+var Bodies = [];
+Bodies[300] = [WORK,CARRY,MOVE];
+
+var body = [WORK,CARRY,MOVE];
+//var body = [WORK,WORK,WORK,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE];
 //var body = [WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE];
 var healer = [HEAL,HEAL,MOVE,MOVE,MOVE,MOVE];
 var fighter = [RANGED_ATTACK, RANGED_ATTACK, MOVE,MOVE,MOVE,MOVE];
@@ -25,14 +23,9 @@ module.exports.loop = function () {
         }
     }
 
-    var energystores = _.filter(Game.structures, (structure) => structure.structureType == STRUCTURE_EXTENSION ||
-                                                                structure.structureType == STRUCTURE_SPAWN);
+    var TotalEnergy = Room.energyAvailable;
+    var MaxEnergy = Room.energyCapacityAvailable;
 
-    var TotalEnergy = 0;
-    for (var i in energystores)
-    {
-        TotalEnergy += energystores[i].energy;
-    }
 
 
 

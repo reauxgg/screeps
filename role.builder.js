@@ -13,7 +13,7 @@ var roleBuilder = {
             creep.memory.role = creep.memory.roleOriginal;
         }
         */
-        
+
 	    if(creep.memory.building && creep.carry.energy == 0) {
             creep.memory.building = false;
 	    }
@@ -31,7 +31,7 @@ var roleBuilder = {
 	    }
 	    else {
 	        var container = creep.pos.findClosestByPath(FIND_STRUCTURES, {filter : (structure) => {
-                        return (structure.structureType == STRUCTURE_CONTAINER)} });
+                        return (structure.structureType == STRUCTURE_CONTAINER) && (struct)} });
 	        if (container)
 	        {
 	            if (creep.dismantle(container) == ERR_NOT_IN_RANGE)
@@ -43,9 +43,9 @@ var roleBuilder = {
 	            var source = creep.pos.findClosestByPath(FIND_SOURCES);
 	            if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(source);
-                }    
+                }
 	        }
-            
+
 	    }
 	}
 };
