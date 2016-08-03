@@ -25,7 +25,7 @@ var roleRepairer = {
                     else {
                         return false;
                     }
-                } 
+                }
             });
             if(repRoad){
                 creep.moveTo(repRoad);

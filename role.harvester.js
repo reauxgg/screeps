@@ -21,12 +21,12 @@ var roleHarvester = {
         }
 
         //If full energy, return energy to structures
-        
+
         else {
             target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                         filter: (structure) => {
-                            return (structure.structureType == STRUCTURE_EXTENSION || 
-                                    structure.structureType == STRUCTURE_SPAWN || 
+                            return (structure.structureType == STRUCTURE_EXTENSION ||
+                                    structure.structureType == STRUCTURE_SPAWN ||
                                     (structure.structureType == STRUCTURE_TOWER && structure.energy < 300)) &&
                                     structure.energy < structure.energyCapacity;
                     }
@@ -48,14 +48,14 @@ var roleHarvester = {
                                 });
                 }
             }
-            
+
 // Move to closest energy container
 // console.log('Giving enrgy to: ' + target)
             if(creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(target);
             }
         }
-        
+
 	}
 };
 
