@@ -16,8 +16,10 @@ var fighter = [RANGED_ATTACK, RANGED_ATTACK, MOVE,MOVE,MOVE,MOVE];
 
 //The real stuff starts here.
 module.exports.loop = function () {
-    for (var name in Memory.creeps) {
-        if (!Game.creeps[name]) {
+    for (var name in Memory.creeps)
+    {
+        if (!Game.creeps[name])
+        {
             delete Memory.creeps[name];
             console.log('Clearing non-existing creep memory:', name);
         }
@@ -25,9 +27,6 @@ module.exports.loop = function () {
 
     var TotalEnergy = Room.energyAvailable;
     var MaxEnergy = Room.energyCapacityAvailable;
-
-
-
 
     var harvesters = _.filter(Game.creeps, (creep) => creep.memory.role == 'harvester');
     var builders = _.filter(Game.creeps, (creep) => creep.memory.role == 'builder');
@@ -62,20 +61,14 @@ module.exports.loop = function () {
     }
 
 //Telling each creep what to do
-    for (var name in Game.creeps) {
+    for (var name in Game.creeps)
+    {
         var creep = Game.creeps[name];
-        if (creep.memory.role == 'harvester') {
+        if (creep.memory.role == 'harvester')
+        {
             roleHarvester.run(creep);
         }
-        if (creep.memory.role == 'upgrader') {
-            roleUpgrader.run(creep);
-        }
-        if (creep.memory.role == 'builder') {
-            roleBuilder.run(creep);
-        }
-        if (creep.memory.role == 'repairer') {
-            roleRepairer.run(creep);
-        }
+
     }
 
 //Tower defense

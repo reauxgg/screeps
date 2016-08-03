@@ -1,5 +1,5 @@
 var CreepBase = require(CreepBase);
-var EnergyLevels = require(CreepBodies);
+var EnergyLevels = CreepBase.EnergyLevels;
 var TaskHarvest = "HARVEST";
 var TaskStore = "STORE";
 var Bodies = [];
