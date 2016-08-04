@@ -13,11 +13,15 @@ var roleHarvester = {
 	    }
         var target = null;
 	    //Get full energy, if needed
-	    if(creep.memory.return == false) {
-            var source = creep.pos.findClosestByPath(FIND_SOURCES);
-            if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(source);
-            }
+	    if(!creep.memory.return) {
+
+	            var source = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
+
+                if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(source);
+                }
+
+
         }
 
         //If full energy, return energy to structures
@@ -36,21 +40,15 @@ var roleHarvester = {
                 target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                             filter: (structure) => {
                                     return (structure.structureType == STRUCTURE_TOWER) &&
-                                            structure.energy < structure.energyCapacity;
+                                            structure.energy < 500;
                             }
                         });
                 if (!target)
                 {
-                    target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                                        filter: (structure) => {
-                                            return (structure.structureType == STRUCTURE_STORAGE);
-                                        }
-                                });
+                    target = creep.room.storage;
                 }
             }
 
-// Move to closest energy container
-// console.log('Giving enrgy to: ' + target)
             if(creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(target);
             }

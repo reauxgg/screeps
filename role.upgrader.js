@@ -3,7 +3,7 @@ var roleUpgrader = {
     /** @param {Creep} creep **/
     run: function(creep) {
 
-        if(creep.memory.upgrading && creep.carry.energy == 0)
+        if(creep.memory.upgrading && creep.carry.energy === 0)
         {
             creep.memory.upgrading = false;
         }
@@ -18,25 +18,32 @@ var roleUpgrader = {
         }
         else
         {
-            var source = creep.pos.findClosestByPath(FIND_SOURCES, {filter : (source) => {return source.energy > 0;}});
-            var container = creep.pos.findClosestByPath(FIND_STRUCTURES, {filter : (structure) => {
-                        return (structure.structureType == STRUCTURE_STORAGE) && (structure.store[RESOURCE_ENERGY] > 300)} });
-            if (container)
-            {
 
-                if(creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE)
+                var container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                        filter : (structure) => {
+                            return (structure.structureType == STRUCTURE_STORAGE) && (structure.store[RESOURCE_ENERGY] > 300);
+                        }
+                    });
+                if (container)
                 {
-                    creep.moveTo(container);
+                    if(creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE)
+                    {
+                        creep.moveTo(container);
+                    }
                 }
-            }
-            else
-            {
+                else
+                {
+                    var source = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
+                    if (source)
+                    {
+                        if(creep.harvest(source) == ERR_NOT_IN_RANGE)
+                        {
+                            creep.moveTo(source);
+                        }
+                    }
+                }
 
-                if(creep.harvest(source) == ERR_NOT_IN_RANGE)
-                {
-                    creep.moveTo(source);
-                }
-            }
+
         }
 	}
 };
