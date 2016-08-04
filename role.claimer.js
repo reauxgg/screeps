@@ -84,7 +84,6 @@ module.exports = {
                 {
                     creep.memory.task = 'ClaimUpgrade';
                 }
-
             }
             else if (creep.memory.task == 'ClaimHarvest')
             {
@@ -119,8 +118,10 @@ module.exports = {
                 });
                 if (storage)
                 {
-                    creep.transfer(storage, RESOURCE_ENERGY);
-                    creep.moveTo(storage);
+                    if (creep.transfer(storage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE)
+                    {
+                        creep.moveTo(storage);
+                    }
                 }
                 else
                 {

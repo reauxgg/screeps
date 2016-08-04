@@ -13,7 +13,7 @@ var body = [WORK,WORK,WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,CAR
 var claimBody = [WORK,WORK,WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE];
 var healer = [HEAL,HEAL,MOVE,MOVE,MOVE,MOVE];
 var fighter = [RANGED_ATTACK, RANGED_ATTACK, MOVE,MOVE,MOVE,MOVE];
-var defender = [ATTACK, ATTACK, ATTACK, ATTACK,ATTACK, MOVE,MOVE,MOVE]
+var defender = [ATTACK, ATTACK, ATTACK, ATTACK,ATTACK, MOVE,MOVE,MOVE];
 //The real stuff starts here.
 module.exports.loop = function () {
     for (var name in Memory.creeps) {
@@ -49,7 +49,7 @@ module.exports.loop = function () {
     var population = harvesters.length + repairers.length + builders.length + upgraders.length + claimers.length + defenders.length;
 
 //These need to be adjusted at the start of a room to WORK,CARRY,MOVE
-    console.log('-------------------------')
+    console.log('-------------------------');
     console.log('Pop:' + population + ' - H:' + harvesters.length + '/' + hCap + ' - R:' + repairers.length + '/' + rCap + ' - B:' + builders.length + '/' + bCap + ' - U:' + upgraders.length + '/' + uCap + ' ......... Enrgy:' + TotalEnergy + '/' + MaxEnergy);
     console.log('Claimers: ' + claimers);
 
@@ -79,14 +79,13 @@ module.exports.loop = function () {
         console.log('Spawning new claimer: ' + newName);
         Memory.cNum++;
     }
-    
+
     if (defenders.length < dCap)
     {
         var newName = Game.spawns['Spawn2'].createCreep(defender, 'D' + Memory.cNum, {role: 'defender'});
         console.log('Spawning new defender: ' + newName);
         Memory.cNum++;
     }
-
 
 
 //Telling each creep what to do
@@ -117,9 +116,12 @@ module.exports.loop = function () {
     });
     for (let tower of towers) {
         var target = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-        if (target != undefined) {
+        if (target) {
             tower.attack(target);
-            Game.notify("Tower has spotted enemies!")
+            if (target.owner.username != 'Invader')
+            {
+                Game.notify("Tower has spotted enemies from" + target.owner.username);
+            }
         }
         else {
 // Turn on tower healing?
@@ -136,7 +138,7 @@ module.exports.loop = function () {
 // Turn off healing
         }
     }
-    
+
     for (let def of defenders)
     {
         var hostile = def.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
@@ -147,4 +149,14 @@ module.exports.loop = function () {
         }
     }
 
-}
+    for (let def of defenders)
+    {
+        var hostile = def.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
+        if (hostile)
+        {
+            def.attack(hostile);
+            def.moveTo(hostile);
+        }
+    }
+
+};
