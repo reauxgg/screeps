@@ -1,8 +1,8 @@
 // Adjust population caps here
-var hCap = 2;
-var bCap = 3;
+var hCap = 3;
+var bCap = 1;
 var rCap = 1;
-var uCap = 2;
+var uCap = 4;
 //var body = [WORK,CARRY,MOVE];
 //var body = [WORK,WORK,WORK,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE];
 var body = [WORK,WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE];
