@@ -18,25 +18,41 @@ var roleUpgrader = {
         }
         else
         {
-            var source = creep.pos.findClosestByPath(FIND_SOURCES, {filter : (source) => {return source.energy > 0;}});
-            var container = creep.pos.findClosestByPath(FIND_STRUCTURES, {filter : (structure) => {
-                        return (structure.structureType == STRUCTURE_STORAGE) && (structure.store[RESOURCE_ENERGY] > 300)} });
-            if (container)
+            var dropped = creep.pos.findClosestByPath(FIND_DROPPED_ENERGY);
+            if (dropped)
             {
-
-                if(creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE)
+                if(creep.pickup(dropped) == ERR_NOT_IN_RANGE)
                 {
-                    creep.moveTo(container);
+                    creep.moveTo(dropped);
                 }
             }
             else
             {
-
-                if(creep.harvest(source) == ERR_NOT_IN_RANGE)
+                var container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                        filter : (structure) => {
+                            return (structure.structureType == STRUCTURE_STORAGE) && (structure.store[RESOURCE_ENERGY] > 300)
+                        }
+                    });
+                if (container)
                 {
-                    creep.moveTo(source);
+                    if(creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE)
+                    {
+                        creep.moveTo(container);
+                    }
+                }
+                else
+                {
+                    var source = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
+                    if (source)
+                    {
+                        if(creep.harvest(source) == ERR_NOT_IN_RANGE)
+                        {
+                            creep.moveTo(source);
+                        }
+                    }
                 }
             }
+
         }
 	}
 };

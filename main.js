@@ -1,8 +1,8 @@
 // Adjust population caps here
-var hCap = 3;
+var hCap = 4;
 var bCap = 1;
 var rCap = 1;
-var uCap = 4;
+var uCap = 3;
 //var body = [WORK,CARRY,MOVE];
 //var body = [WORK,WORK,WORK,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE];
 var body = [WORK,WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE];
@@ -96,9 +96,13 @@ module.exports.loop = function () {
         else {
 // Turn on tower healing?
             var closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
-                filter: (structure) => structure.structureType == STRUCTURE_WALL && structure.hits < 125000 && structure.hits != structure.hitsMax
+                filter: (structure) => (structure.structureType == STRUCTURE_WALL ||
+                                        structure.structureType == STRUCTURE_RAMPART ||
+                                        structure.structureType == STRUCTURE_ROAD) &&
+                                        structure.hits < 125000 &&
+                                        structure.hits != structure.hitsMax
             });
-            if(closestDamagedStructure && tower.energy > 500) {
+            if(closestDamagedStructure && tower.energy > 300) {
                 tower.repair(closestDamagedStructure);
             }
 // Turn off healing
