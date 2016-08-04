@@ -96,11 +96,11 @@ module.exports.loop = function () {
         else {
 // Turn on tower healing?
             var closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
-                filter: (structure) => (structure.structureType == STRUCTURE_WALL ||
-                                        structure.structureType == STRUCTURE_RAMPART ||
-                                        structure.structureType == STRUCTURE_ROAD) &&
-                                        structure.hits < 125000 &&
-                                        structure.hits != structure.hitsMax
+                filter: (structure) => ((structure.structureType == STRUCTURE_WALL ||
+                                        structure.structureType == STRUCTURE_RAMPART) &&
+                                        structure.hits < 125000) ||
+                                        ((structure.structureType == STRUCTURE_ROAD) &&
+                                        structure.hits < (structure.hitsMax / 1.3))
             });
             if(closestDamagedStructure && tower.energy > 300) {
                 tower.repair(closestDamagedStructure);
