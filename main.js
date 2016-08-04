@@ -1,5 +1,5 @@
 var CreepBase = require('CreepBase');
-var Harvester = require('role.harvester');
+var Harvester = require('Harvester');
 
 
 var hCap = 4;
@@ -30,8 +30,9 @@ module.exports.loop = function () {
         var TotalEnergy = Room.energyAvailable;
         var MaxEnergy = Room.energyCapacityAvailable;
         var Population = 0;
+        var RoomCreeps = MyRoom.find(FIND_MY_CREEPS);
 
-        console.log(MyRoom.find(FIND_STRUCTURES));
+
 
         //These need to be adjusted at the start of a room to WORK,CARRY,MOVE
         console.log('-------------------------')

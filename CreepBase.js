@@ -10,17 +10,7 @@ var CreepBase = {
     Heal : 'HEAL',
     Claim : 'CLAIM',
     Attack : 'ATTACK',
-    EnergyLevels : {
-        Level1 : 300,
-        Level2 : 550,
-        Level3 : 800,
-        Level4 : 1300,
-        Level5 : 1800,
-        Level6 : 2300,
-        Level7 : 5300,
-        Level8 : 12300
-    },
-
+    
     GetHarvestTargets : function(creep) {
         var Active = creep.room.find(FIND_SOURCES_ACTIVE);
         if (Active.length > 0)
