@@ -72,66 +72,65 @@ module.exports = {
 
                 }
             }
+            if (creep.memory.task == 'ClaimBuilder')
+            {
+                target = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
+                console.log(target);
+                if (creep.build(target) == ERR_NOT_IN_RANGE)
+                {
+                    creep.moveTo(target);
+                }
 
+            }
+            else if (creep.memory.task == 'ClaimHarvest')
+            {
+
+                target = creep.pos.findClosestByPath(FIND_SOURCES);
+                console.log(target);
+                if (target)
+                {
+                    if (creep.harvest(target) == ERR_NOT_IN_RANGE)
+                    {
+                        creep.moveTo(target);
+                    }
+                }
+
+            }
+            else if (creep.memory.task == 'ClaimUpgrade')
+            {
+                creep.upgradeController(creep.room.controller);
+                creep.moveTo(creep.room.controller);
+            }
+            else if (creep.memory.task == 'ClaimStore')
+            {
+                var stor = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                    filter : (obj) => {
+                        return ((obj.structureType == STRUCTURE_SPAWN) ||
+                                (obj.structureType == STRUCTURE_EXTENSION)) &&
+                                obj.energy < obj.energyCapacity;
+                    }
+                });
+                if (stor)
+                {
+                    creep.transfer(stor, RESOURCE_ENERGY);
+                    creep.moveTo(stor);
+                }
+                else
+                {
+                    creep.memory.task = 'ClaimUpgrade';
+                    creep.moveTo(creep.room.controller);
+                }
+
+            }
+            else if (creep.memory.task == 'ClaimRepair')
+            {
+                creep.repair(target);
+                creep.moveTo(target);
+            }
         }
         if (creep.carry.energy == 0)
         {
             creep.memory.task = 'ClaimHarvest';
-        }
-        if (creep.memory.task == 'ClaimBuilder')
-        {
-            target = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
-            console.log(target);
-            if (creep.build(target) == ERR_NOT_IN_RANGE)
-            {
-                creep.moveTo(target);
-            }
-
-        }
-        else if (creep.memory.task == 'ClaimHarvest')
-        {
-
-            target = creep.pos.findClosestByPath(FIND_SOURCES);
-            console.log(target);
-            if (target)
-            {
-                if (creep.harvest(target) == ERR_NOT_IN_RANGE)
-                {
-                    creep.moveTo(target);
-                }
-            }
-
-        }
-        else if (creep.memory.task == 'ClaimUpgrade')
-        {
-            creep.upgradeController(creep.room.controller);
-            creep.moveTo(creep.room.controller);
-        }
-        else if (creep.memory.task == 'ClaimStore')
-        {
-            var stor = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                filter : (obj) => {
-                    return ((obj.structureType == STRUCTURE_SPAWN) ||
-                            (obj.structureType == STRUCTURE_EXTENSION)) &&
-                            obj.energy < obj.energyCapacity;
-                }
-            });
-            if (stor)
-            {
-                creep.transfer(stor, RESOURCE_ENERGY);
-                creep.moveTo(stor);
-            }
-            else
-            {
-                creep.memory.task = 'ClaimUpgrade';
-                creep.moveTo(creep.room.controller);
-            }
-
-        }
-        else if (creep.memory.task == 'ClaimRepair')
-        {
-            creep.repair(target);
-            creep.moveTo(target);
         }
     }
 

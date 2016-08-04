@@ -1,9 +1,10 @@
 // Adjust population caps here
 var hCap = 4;
-var bCap = 2;
+var bCap = 1;
 var rCap = 1;
 var uCap = 2;
-var cCap = 1;
+var cCap = 3;
+var dCap = 1;
 
 //var body = [WORK,CARRY,MOVE];
 //var body = [WORK,WORK,WORK,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE];
@@ -11,7 +12,7 @@ var body = [WORK,WORK,WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,CAR
 var claimBody = [WORK,WORK,WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE];
 var healer = [HEAL,HEAL,MOVE,MOVE,MOVE,MOVE];
 var fighter = [RANGED_ATTACK, RANGED_ATTACK, MOVE,MOVE,MOVE,MOVE];
-
+var defender = [ATTACK, ATTACK, ATTACK, ATTACK,ATTACK, MOVE,MOVE,MOVE]
 //The real stuff starts here.
 module.exports.loop = function () {
     for (var name in Memory.creeps) {
@@ -43,7 +44,8 @@ module.exports.loop = function () {
     var upgraders = _.filter(Game.creeps, (creep) => creep.memory.role == 'upgrader');
     var repairers = _.filter(Game.creeps, (creep) => creep.memory.role == 'repairer');
     var claimers = _.filter(Game.creeps, (creep) => creep.memory.role == 'claimer');
-    var population = harvesters.length + repairers.length + builders.length + upgraders.length + claimers.length;
+    var defenders = _.filter(Game.creeps, (creep) => creep.memory.role == 'defender');
+    var population = harvesters.length + repairers.length + builders.length + upgraders.length + claimers.length + defenders.length;
 
 //These need to be adjusted at the start of a room to WORK,CARRY,MOVE
     console.log('-------------------------')
@@ -74,6 +76,13 @@ module.exports.loop = function () {
     else if (claimers.length < cCap) {
         var newName = Game.spawns['Spawn1'].createCreep(claimBody, 'C' + Memory.cNum, {role: 'claimer'});
         console.log('Spawning new claimer: ' + newName);
+        Memory.cNum++;
+    }
+
+    if (defenders.length < dCap)
+    {
+        var newName = Game.spawns['Spawn2'].createCreep(defender, 'D' + Memory.cNum, {role: 'defender'});
+        console.log('Spawning new defender: ' + newName);
         Memory.cNum++;
     }
 
@@ -124,6 +133,16 @@ module.exports.loop = function () {
                 tower.repair(closestDamagedStructure);
             }
 // Turn off healing
+        }
+    }
+
+    for (let def of defenders)
+    {
+        var hostile = def.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
+        if (hostile)
+        {
+            def.attack(hostile);
+            def.moveTo(hostile);
         }
     }
 
