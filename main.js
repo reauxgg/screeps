@@ -25,14 +25,14 @@ module.exports.loop = function () {
     for (var Name in Game.rooms)
     {
         var MyRoom = Game.rooms[Name];
-        var TotalEnergy = Room.energyAvailable;
-        var MaxEnergy = Room.energyCapacityAvailable;
+        var TotalEnergy = MyRoom.energyAvailable;
+        var MaxEnergy = MyRoom.energyCapacityAvailable;
         var RoomCreeps = MyRoom.find(FIND_MY_CREEPS);
         var Population = RoomCreeps.length;
         var HarvPop = 0;
         var Unknown = 0;
 
-        for (var Creep in RoomCreeps)
+        for (let Creep of RoomCreeps)
         {
             switch(Creep.memory.Role)
             {
@@ -48,16 +48,25 @@ module.exports.loop = function () {
         if (HarvPop < hCap)
         {
             var NewBody = Harvester.GetBody(MyRoom.energyCapacityAvailable);
-            for (var Spawn in MyRoom.find(FIND_MY_SPAWNS))
+            var Spawns = MyRoom.find(FIND_STRUCTURES, {
+                    filter : obj => {
+                        return (obj.structureType == STRUCTURE_SPAWN);
+                    }
+            });
+            for (let Spawn of Spawns)
             {
-                if (!Spawn.spawning)
+                var name = ""
+                if (Spawn.canCreateCreep(NewBody, "H" + CreepCount) == 0)
                 {
-                    var result = Spawn.createCreep(NewBody, "H" + CreepCount, {Role: CreepBase.Harvest});
-                    if (_.isString(result))
+                    name = Spawn.createCreep(NewBody, "H" + CreepCount++, {Role: CreepBase.Harvest, Target: null});
+                    console.log("Built new Harvester, " + name);
+                    CreepCount++;
+                }
+                else
+                {
+                    while (Spawn.canCreateCreep(NewBody, "H" + CreepCount) == -3)
                     {
-                        console.log("Built new Harvester, " + result);
                         CreepCount++;
-                        break;
                     }
                 }
             }

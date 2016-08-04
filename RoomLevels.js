@@ -1,5 +1,4 @@
 var RoomLevels = {
-  EnergyLevels : {
       Level1 : 300,
       Level2 : 550,
       Level3 : 800,
@@ -8,7 +7,6 @@ var RoomLevels = {
       Level6 : 2300,
       Level7 : 5300,
       Level8 : 12300
-  },
 };
 
 module.exports = RoomLevels;

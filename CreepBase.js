@@ -10,8 +10,14 @@ var CreepBase = {
     Heal : 'HEAL',
     Claim : 'CLAIM',
     Attack : 'ATTACK',
-    
-    GetHarvestTargets : function(creep) {
+
+    GetHarvestTargets : function(creep)
+    {
+        var Dropped = creep.room.find(FIND_DROPPED_ENERGY);
+        if (Dropped.length > 0)
+        {
+            return Dropped;
+        }
         var Active = creep.room.find(FIND_SOURCES_ACTIVE);
         if (Active.length > 0)
         {
@@ -31,6 +37,7 @@ var CreepBase = {
             return LowestRegen;
         }
     },
+
     GetBuildTargets : function (creep) {
         return creep.room.find(FIND_CONSTRUCTION_SITES);
     },
