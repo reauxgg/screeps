@@ -61,16 +61,22 @@ var roleUpgrader = {
         });
         if (Spawns.length > 0)
         {
-            var Body = this.GetBody(Room.energyCapacityAvailable);
+            var Body = this.GetBody(Game.rooms[Room].energyCapacityAvailable);
             for (let Spawn of Spawns)
             {
                 if (Spawn.canCreateCreep(Body, Name) == 0)
                 {
                     return Spawn.createCreep(Body, Name, { Role : UpCB.Upgrade, Target : null, Task : UpCB.Harvest});
                 }
+                else
+                {
+                    return Spawn.canCreateCreep(Body, Name);
+                }
+
             }
         }
     },
+
     RunHarvest : function (Creep)
     {
         var Target = null;

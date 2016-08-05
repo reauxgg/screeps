@@ -64,7 +64,6 @@ var Harvester =
         if (Spawns.length > 0)
         {
             var Body = this.GetBody(Game.rooms[Room].energyCapacityAvailable);
-            console.log(Body);
             for (let Spawn of Spawns)
             {
                 if (Spawn.canCreateCreep(Body, Name) == 0)
