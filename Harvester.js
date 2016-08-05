@@ -1,7 +1,7 @@
 var HarvCB = require('CreepBase');
 var HarvRL = require('RoomLevels');
 var HarvBody = {
-    Level1 : [  WORK,
+    Level1 : [  WORK,WORK,
                 CARRY,
                 MOVE],
     Level2 : [  WORK,WORK,
@@ -159,6 +159,10 @@ var Harvester =
         if (Creep.transfer(Target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE)
         {
             Creep.moveTo(Target);
+        }
+        else
+        {
+            Creep.memory.Target = null;
         }
     },
 

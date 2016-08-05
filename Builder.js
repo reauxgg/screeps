@@ -66,7 +66,7 @@ var roleUpgrader = {
             {
                 if (Spawn.canCreateCreep(Body, Name) == 0)
                 {
-                    return Spawn.createCreep(Body, Name, { Role : BuildCB.Build, Target : null, Task : HarvCB.Harvest});
+                    return Spawn.createCreep(Body, Name, { Role : BuildCB.Build, Target : null, Task : BuildCB.Harvest});
                 }
                 else
                 {
