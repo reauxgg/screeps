@@ -1,53 +1,143 @@
-var roleBuilder = {
-
-    /** @param {Creep} creep **/
-    run: function(creep) {
-        /*
-        if (!(creep.room.find(FIND_CONSTRUCTION_SITES)))
-        {
-            if (!creep.memory.roleOriginal)
-            {
-                creep.memory.roleOriginal = 'builder';
-            }
-            creep.memory.role = 'upgrader';
-            creep.memory.role = creep.memory.roleOriginal;
-        }
-        */
-
-	    if(creep.memory.building && creep.carry.energy == 0) {
-            creep.memory.building = false;
-	    }
-	    if(!creep.memory.building && creep.carry.energy == creep.carryCapacity) {
-	        creep.memory.building = true;
-	    }
-
-	    if(creep.memory.building) {
-	        var targets = creep.room.find(FIND_CONSTRUCTION_SITES);
-            if(targets) {
-                if(creep.build(targets[0]) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(targets[0]);
-                }
-            }
-	    }
-	    else {
-	        var container = creep.pos.findClosestByPath(FIND_STRUCTURES, {filter : (structure) => {
-                        return (structure.structureType == STRUCTURE_CONTAINER) && (struct)} });
-	        if (container)
-	        {
-	            if (creep.dismantle(container) == ERR_NOT_IN_RANGE)
-	            {
-	                creep.moveTo(container);
-	            }
-	        }
-	        else {
-	            var source = creep.pos.findClosestByPath(FIND_SOURCES);
-	            if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(source);
-                }
-	        }
-
-	    }
-	}
+var BuildCB = require('CreepBase');
+var BuildRL = require('RoomLevels');
+var BuildBody = {
+    Level1 : [  WORK,
+                CARRY,
+                MOVE],
+    Level2 : [  WORK,WORK,
+                CARRY,CARRY,
+                MOVE,MOVE],
+    Level3 : [  WORK,WORK,WORK,
+                CARRY,CARRY,CARRY,
+                MOVE,MOVE,MOVE],
+    Level4 : [  WORK,WORK,WORK,
+                CARRY,CARRY,CARRY,CARRY,CARRY,
+                MOVE,MOVE,MOVE,MOVE],
+    Level5 : [  WORK,WORK,WORK,WORK,
+                CARRY,CARRY,CARRY,CARRY,CARRY,
+                MOVE,MOVE,MOVE,MOVE,MOVE],
+    Level6 : [  WORK,WORK,WORK,WORK,
+                CARRY,CARRY,CARRY,CARRY,CARRY,
+                MOVE,MOVE,MOVE,MOVE,MOVE],
 };
 
-module.exports = roleBuilder;
+var roleUpgrader = {
+    GetBody : function(level)
+    {
+        if (level <= BuildRL.Level1)
+        {
+            return BuildBody.Level1;
+        }
+        if (level <= BuildRL.Level2)
+        {
+            return BuildBody.Level2;
+        }
+        if (level <= BuildRL.Level3)
+        {
+            return BuildBody.Level3;
+        }
+        if (level <= BuildRL.Level4)
+        {
+            return BuildBody.Level4;
+        }
+        if (level <= BuildRL.Level5)
+        {
+            return BuildBody.Level5;
+        }
+        if (level <= BuildRL.Level6)
+        {
+            return BuildBody.Level6;
+        }
+
+        return BuildBody.Level1;
+    },
+
+    Spawn : function(Room, Name)
+    {
+        var Spawns = Game.rooms[Room].find(FIND_STRUCTURES, {
+            filter : (obj) => {
+                return obj.structureType == STRUCTURE_SPAWN;
+            }
+        });
+        if (Spawns.length > 0)
+        {
+            var Body = this.GetBody(Room.energyCapacityAvailable);
+            for (let Spawn of Spawns)
+            {
+                if (Spawn.canCreateCreep(Body, Name) == 0)
+                {
+                    return Spawn.createCreep(Body, Name, { Role : BuildCB.Build, Target : null, Task : BuildCB.Harvest});
+                }
+            }
+        }
+    },
+    RunHarvest : function (Creep)
+    {
+        var Target = null;
+        if (!Creep.memory.Target)
+        {
+            Target = Creep.pos.findClosestByPath(BuildCB.GetHarvestTargets(Creep));
+            Creep.memory.Target = Target.id;
+        }
+        else
+        {
+            Target = Game.getObjectById(Creep.memory.Target);
+        }
+        switch(Creep.harvest(Target))
+        {
+            case ERR_INVALID_TARGET:
+                Creep.pickup(Target);
+            case ERR_NOT_IN_RANGE:
+                Creep.moveTo(Target);
+            default:
+                Creep.memory.Target = null;
+        }
+    },
+
+    Run: function(Creep) {
+        if (Creep.carry.energy == 0)
+        {
+            if (Creep.memory.Task == BuildCB.Build)
+            {
+                Creep.memory.Target = null;
+            }
+            Creep.memory.Task = BuildCB.Harvest;
+        }
+        if (Creep.carry.energy == Creep.carryCapacity)
+        {
+            if (Creep.memory.Task == BuildCB.Harvest)
+            {
+                Creep.memory.Target = null;
+            }
+            Creep.memory.Task = BuildCB.Build;
+        }
+
+        switch (Creep.memory.Task)
+        {
+            case BuildCB.Build:
+                var Site = Creep.pos.findClosestByPath(BuildCB.GetBuildTargets(Creep));
+                if (Site)
+                {
+                    if (Creep.build(Site) == ERR_NOT_IN_RANGE)
+                    {
+                        Creep.moveTo(Site);
+                    }
+                }
+                break;
+            case BuildCB.Harvest:
+                if (Creep.room.storage)
+                {
+                    if (Creep.transfer(Creep.room.storage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE)
+                    {
+                        Creep.moveTo(Creep.room.stoage);
+                    }
+                }
+                else
+                {
+                    this.RunHarvest(Creep);
+                }
+        }
+    }
+};
+
+module.exports = roleUpgrader;

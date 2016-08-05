@@ -1,173 +1,176 @@
-var CreepBase = require(CreepBase);
-var EnergyLevels = CreepBase.EnergyLevels;
-var TaskHarvest = "HARVEST";
-var TaskStore = "STORE";
-var Bodies = [];
-Bodies[EnergyLevels.Level1] = [WORK,
-                               CARRY,
-                               MOVE];
-Bodies[EnergyLevels.Level2] = [WORK,WORK,
-                               CARRY,CARRY,
-                               MOVE,MOVE];
-Bodies[EnergyLevels.Level3] = [WORK,WORK,WORK,
-                               CARRY,CARRY,CARRY,
-                               MOVE,MOVE,MOVE];
-Bodies[EnergyLevels.Level4] = [WORK,WORK,WORK,
-                               CARRY,CARRY,CARRY,CARRY,CARRY,
-                               MOVE,MOVE,MOVE,MOVE];
-Bodies[EnergyLevels.Level5] = [WORK,WORK,WORK,WORK,
-                               CARRY,CARRY,CARRY,CARRY,CARRY,
-                               MOVE,MOVE,MOVE,MOVE,MOVE];
-Bodies[EnergyLevels.Level6] = [WORK,WORK,WORK,WORK,
-                               CARRY,CARRY,CARRY,CARRY,CARRY,
-                               MOVE,MOVE,MOVE,MOVE,MOVE];
-
-var roleHarvester = {
-    GetBody : function (Level)
-    {
-        for (var key in Bodies.keys)
-        {
-            if (Level <= key)
-            {
-                return Bodies[key];
-            }
-        }
-    },
-    AssignRole : function (creep)
-    {
-        creep.memory.role = CreepBase.Harvest;
-    },
-
-    AssignTarget : function (creep, objs)
-    {
-        creep.memory.Target = creep.room.pos.findClosestByPath(objs);
-    },
-
-    CheckTarget : function (creep)
-    {
-        var target = creep.memory.Target;
-        switch (creep.memory.Task)
-        {
-            case TaskHarvest:
-                return target.energy > 0;
-            case TaskStore:
-                try
-                {
-                    return (target.storeCapacity > target.store[RESOURCE_ENERGY]);
-                }
-                catch (err)
-                {
-                    return (target.energyCapacity > target.energy);
-                }
-                break;
-            default:
-                return false;
-        }
-    },
-
-    Run: function(creep)
-    {
-        //Check for full energy
-	    if(creep.carry.energy == creep.carryCapacity)
-        {
-	        creep.memory.Task = TaskStore;
-	    }
-	    if(creep.carry.energy < 50)
-        {
-	        creep.memory.Task = TaskHarvest;
-	    }
-
-        if (creep.memory.target)
-        {
-            switch (creep.memory.Task)
-            {
-                case TaskStore:
-                    if (creep.transfer(creep.memory.target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE)
-                    {
-                        creep.moveTo(creep.memory.target);
-                    }
-                    else
-                    {
-                        // If that fails, try to get a new target next tick...
-                        creep.memory.target = null;
-                    }
-                    break;
-                case TaskHarvest:
-                //default to try to harvest
-                default:
-                    if (creep.harvest(creep.memory.target) == ERR_NOT_IN_RANGE)
-                    {
-                        creep.moveTo(creep.memory.target);
-                    }
-                    else
-                    {
-                        creep.memory.target = null;
-                    }
-            }
-        }
-
-	    //Get full energy, if needed
-	    if(creep.memory.return === false) {
-            var source = creep.pos.findClosestByPath(FIND_SOURCES);
-            if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(source);
-            }
-        }
-
-        //If full energy, return energy to structures
-        else
-        {
-            var target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                                                    filter: (structure) => {
-                                                        return (structure.structureType == STRUCTURE_EXTENSION ||
-                                                                structure.structureType == STRUCTURE_SPAWN ||
-                                                                (structure.structureType == STRUCTURE_TOWER &&
-                                                                    structure.energy < 300)) &&
-                                                                structure.energy < structure.energyCapacity;
-                                                            }
-                                                        });
-            if (!target)
-            {
-                target = creep.pos.findClosestByPath(FIND_STRUCTURES, {filter: (structure) => {
-                                                                return structure.structureType == STRUCTURE_TOWER &&
-                                                                        structure.energy < structure.energyCapacity;
-                                                                    }
-                                                                });
-            }
-            else if (target === null)
-            {
-                target = creep.pos.findClosestByPath(FIND_STRUCTURES, { filter: (structure) => {
-                                                            return (structure.structureType == STRUCTURE_STORAGE) &&
-                                                            structure.store[RESOURCE_ENERGY] < structure.storeCapacity;
-                                                            }
-                                                        });
-                if (target)
-                {
-                    if (creep.transfer(target) == ERR_NOT_IN_RANGE)
-                    {
-                        creep.moveTo(target);
-                    }
-                }
-            }
-            else
-            {
-                /*if (!creep.memory.roleOriginal)
-                {
-                    creep.memory.roleOriginal = 'harvester';
-                }
-                creep.memory.role = 'builder';
-                */
-            }
-
-// Move to closest energy container
-// console.log('Giving enrgy to: ' + target)
-            if(creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(target);
-            }
-        }
-
-	}
-
+var HarvCB = require('CreepBase');
+var HarvRL = require('RoomLevels');
+var HarvBody = {
+    Level1 : [  WORK,
+                CARRY,
+                MOVE],
+    Level2 : [  WORK,WORK,
+                CARRY,CARRY,
+                MOVE,MOVE],
+    Level3 : [  WORK,WORK,WORK,
+                CARRY,CARRY,CARRY,
+                MOVE,MOVE,MOVE],
+    Level4 : [  WORK,WORK,WORK,
+                CARRY,CARRY,CARRY,CARRY,CARRY,
+                MOVE,MOVE,MOVE,MOVE],
+    Level5 : [  WORK,WORK,WORK,WORK,
+                CARRY,CARRY,CARRY,CARRY,CARRY,
+                MOVE,MOVE,MOVE,MOVE,MOVE],
+    Level6 : [  WORK,WORK,WORK,WORK,
+                CARRY,CARRY,CARRY,CARRY,CARRY,
+                MOVE,MOVE,MOVE,MOVE,MOVE],
 };
 
-module.exports = roleHarvester;
+
+var Harvester =
+{
+    GetBody : function(level)
+    {
+        if (level <= HarvRL.Level1)
+        {
+            return HarvBody.Level1;
+        }
+        if (level <= HarvRL.Level2)
+        {
+            return HarvBody.Level2;
+        }
+        if (level <= HarvRL.Level3)
+        {
+            return HarvBody.Level3;
+        }
+        if (level <= HarvRL.Level4)
+        {
+            return HarvBody.Level4;
+        }
+        if (level <= HarvRL.Level5)
+        {
+            return HarvBody.Level5;
+        }
+        if (level <= HarvRL.Level6)
+        {
+            return HarvBody.Level6;
+        }
+
+        return HarvBody.Level1;
+    },
+
+    Spawn : function(Room, Name)
+    {
+        var Spawns = Game.rooms[Room].find(FIND_STRUCTURES, {
+            filter : (obj) => {
+                return obj.structureType == STRUCTURE_SPAWN;
+            }
+        });
+        if (Spawns.length > 0)
+        {
+            var Body = this.GetBody(Room.energyCapacityAvailable);
+            for (let Spawn of Spawns)
+            {
+                if (Spawn.canCreateCreep(Body, Name) == 0)
+                {
+                    return Spawn.createCreep(Body, Name, { Role : HarvCB.Harvest, Target : null, Task : HarvCB.Harvest});
+                }
+            }
+        }
+    },
+
+    AssignTask : function(Creep)
+    {
+        if (Creep.carry.energy == Creep.carryCapacity)
+        {
+            if (Creep.memory.Task == HarvCB.Harvest)
+            {
+                Creep.memory.Target = null;
+            }
+            Creep.memory.Task = HarvCB.Store;
+        }
+        else if (Creep.carry.energy < 50)
+        {
+            if (Creep.memory.Task == HarvCB.Store)
+            {
+                Creep.memory.Target = null;
+            }
+            Creep.memory.Task = HarvCB.Harvest;
+        }
+    },
+    RunHarvest : function (Creep)
+    {
+        var Target = null;
+        if (!Creep.memory.Target)
+        {
+            Target = Creep.pos.findClosestByPath(HarvCB.GetHarvestTargets(Creep));
+            Creep.memory.Target = Target.id;
+        }
+        else
+        {
+            Target = Game.getObjectById(Creep.memory.Target);
+        }
+        switch(Creep.harvest(Target))
+        {
+            case ERR_INVALID_TARGET:
+                Creep.pickup(Target);
+            case ERR_NOT_IN_RANGE:
+            default:
+                Creep.moveTo(Target);
+        }
+    },
+
+    RunStore : function(Creep)
+    {
+        var Target = null;
+        if (!Creep.memory.Target)
+        {
+            var Targets = HarvCB.GetStorageTargets(Creep);
+            var Priority = Targets.filter(function(obj) {
+                    return ((obj.structureType == STRUCTURE_SPAWN) ||
+                            (obj.structureType == STRUCTURE_EXTENSION)) &&
+                            (obj.energy < obj.energyCapacity);
+                });
+            if (Priority.length == 0)
+            {
+                var Priority = Targets.filter(function(obj) {
+                        return (obj.structureType == STRUCTURE_TOWER) &&
+                                (obj.energy < obj.energyCapacity);
+                });
+                if (Priority.length == 0)
+                {
+                    var Priorty = [Creep.room.storage];
+                }
+            }
+            Target = Creep.pos.findClosestByPath(Priority);
+            if (Target)
+            {
+                Creep.memory.Target = Target.id;
+            }
+
+        }
+        else
+        {
+            Target = Game.getObjectById(Creep.memory.Target);
+        }
+
+        if (Creep.transfer(Target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE)
+        {
+            Creep.moveTo(Target);
+        }
+    },
+
+    Run : function(Creep)
+    {
+        this.AssignTask(Creep);
+        switch (Creep.memory.Task)
+        {
+            case HarvCB.Harvest:
+                this.RunHarvest(Creep);
+                break;
+            case HarvCB.Store:
+                this.RunStore(Creep);
+                break;
+            default:
+                HarvCB.RunIdle(Creep);
+                break;
+        }
+    }
+};
+
+module.exports = Harvester;

@@ -1,39 +1,141 @@
+var UpCB = require('CreepBase');
+var UpRL = require('RoomLevels');
+var UpBody = {
+    Level1 : [  WORK,
+                CARRY,
+                MOVE],
+    Level2 : [  WORK,WORK,
+                CARRY,CARRY,
+                MOVE,MOVE],
+    Level3 : [  WORK,WORK,WORK,
+                CARRY,CARRY,CARRY,
+                MOVE,MOVE,MOVE],
+    Level4 : [  WORK,WORK,WORK,
+                CARRY,CARRY,CARRY,CARRY,CARRY,
+                MOVE,MOVE,MOVE,MOVE],
+    Level5 : [  WORK,WORK,WORK,WORK,
+                CARRY,CARRY,CARRY,CARRY,CARRY,
+                MOVE,MOVE,MOVE,MOVE,MOVE],
+    Level6 : [  WORK,WORK,WORK,WORK,
+                CARRY,CARRY,CARRY,CARRY,CARRY,
+                MOVE,MOVE,MOVE,MOVE,MOVE],
+};
+
 var roleUpgrader = {
-
-    /** @param {Creep} creep **/
-    run: function(creep) {
-
-        if(creep.memory.upgrading && creep.carry.energy == 0)
+    GetBody : function(level)
+    {
+        if (level <= UpRL.Level1)
         {
-            creep.memory.upgrading = false;
+            return UpBody.Level1;
         }
-	    if(!creep.memory.upgrading && creep.carry.energy == creep.carryCapacity)
-      {
-	        creep.memory.upgrading = true;
-	    }
+        if (level <= UpRL.Level2)
+        {
+            return UpBody.Level2;
+        }
+        if (level <= UpRL.Level3)
+        {
+            return UpBody.Level3;
+        }
+        if (level <= UpRL.Level4)
+        {
+            return UpBody.Level4;
+        }
+        if (level <= UpRL.Level5)
+        {
+            return UpBody.Level5;
+        }
+        if (level <= UpRL.Level6)
+        {
+            return UpBody.Level6;
+        }
 
-	    if(creep.memory.upgrading)
-      {
-            if(creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE)
-            {
-                creep.moveTo(creep.room.controller);
+        return UpBody.Level1;
+    },
+
+    Spawn : function(Room, Name)
+    {
+        var Spawns = Game.rooms[Room].find(FIND_STRUCTURES, {
+            filter : (obj) => {
+                return obj.structureType == STRUCTURE_SPAWN;
             }
-      }
-      else {
-          var sources = creep.room.find(FIND_SOURCES);
-            var container = creep.pos.findClosestByPath(FIND_STRUCTURES, {filter : (structure) => {
-                        return (structure.structureType == STRUCTURE_CONTAINER && structure.store[RESOURCE_ENERGY] > 50)} });
-            if (container)
+        });
+        if (Spawns.length > 0)
+        {
+            var Body = this.GetBody(Room.energyCapacityAvailable);
+            for (let Spawn of Spawns)
             {
-                if(creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(container);
+                if (Spawn.canCreateCreep(Body, Name) == 0)
+                {
+                    return Spawn.createCreep(Body, Name, { Role : UpCB.Upgrade, Target : null, Task : UpCB.Harvest});
                 }
             }
-            else if(creep.harvest(sources[0]) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(sources[0]);
-            }
         }
-	}
+    },
+    RunHarvest : function (Creep)
+    {
+        var Target = null;
+        if (!Creep.memory.Target)
+        {
+            Target = Creep.pos.findClosestByPath(UpCB.GetHarvestTargets(Creep));
+            Creep.memory.Target = Target.id;
+        }
+        else
+        {
+            Target = Game.getObjectById(Creep.memory.Target);
+        };
+
+        switch(Creep.harvest(Target))
+        {
+            case ERR_INVALID_TARGET:
+                Creep.pickup(Target);
+            case ERR_NOT_IN_RANGE:
+                Creep.moveTo(Target);
+            default:
+                Creep.memory.Target = null;
+        }
+    },
+
+
+    Run: function(Creep) {
+        if (Creep.carry.energy == 0)
+        {
+            if (Creep.memory.Task == UpCB.Upgrade)
+            {
+                Creep.memory.Target = null;
+            }
+            Creep.memory.Task = UpCB.Harvest;
+        }
+        if (Creep.carry.energy == Creep.carryCapacity)
+        {
+            if (Creep.memory.Task == UpCB.Harvest)
+            {
+                Creep.memory.Target = null;
+            }
+            Creep.memory.Task = UpCB.Upgrade;
+        }
+
+        switch (Creep.memory.Task)
+        {
+            case UpCB.Upgrade:
+                if (Creep.upgradeController(Creep.room.controller) == ERR_NOT_IN_RANGE)
+                {
+                    Creep.moveTo(Creep.room.controller);
+                }
+                break;
+            case UpCB.Harvest:
+                if (Creep.room.storage)
+                {
+                    if (Creep.transfer(Creep.room.storage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE)
+                    {
+                        Creep.moveTo(Creep.room.stoage);
+                    }
+                }
+                else
+                {
+                    this.RunHarvest(Creep);
+                }
+        }
+    }
 };
 
 module.exports = roleUpgrader;

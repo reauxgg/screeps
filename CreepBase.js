@@ -10,6 +10,7 @@ var CreepBase = {
     Heal : 'HEAL',
     Claim : 'CLAIM',
     Attack : 'ATTACK',
+    Store : 'STORE',
 
     GetHarvestTargets : function(creep)
     {
@@ -105,6 +106,17 @@ var CreepBase = {
                         (obj.structureType == STRUCTURE_STORAGE);
             }
         });
+    },
+    RunIdle : function(creep)
+    {
+        var Target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+            filter : (obj) => { return obj.structureType == STRUCTURE_SPAWN;}
+        });
+        if (!Target)
+        {
+            Target = creep.room.controller;
+        }
+        creep.moveTo(Target);
     }
 };
 

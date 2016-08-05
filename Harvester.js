@@ -22,8 +22,10 @@ var HarvBody = {
 };
 
 
-var Harvester = {
-    GetBody : function(level) {
+var Harvester =
+{
+    GetBody : function(level)
+    {
         if (level <= HarvRL.Level1)
         {
             return HarvBody.Level1;
@@ -48,88 +50,133 @@ var Harvester = {
         {
             return HarvBody.Level6;
         }
+
+        return HarvBody.Level1;
     },
 
-    Run : function(Creep)
+    Spawn : function(Room, Name)
+    {
+        var Spawns = Game.rooms[Room].find(FIND_STRUCTURES, {
+            filter : (obj) => {
+                return obj.structureType == STRUCTURE_SPAWN;
+            }
+        });
+        if (Spawns.length > 0)
+        {
+            var Body = this.GetBody(Game.rooms[Room].energyCapacityAvailable);
+            console.log(Body);
+            for (let Spawn of Spawns)
+            {
+                if (Spawn.canCreateCreep(Body, Name) == 0)
+                {
+                    return Spawn.createCreep(Body, Name, { Role : HarvCB.Harvest, Target : null, Task : HarvCB.Harvest});
+                }
+                else
+                {
+                    return Spawn.canCreateCreep(Body, Name);
+                }
+
+            }
+        }
+    },
+
+    AssignTask : function(Creep)
     {
         if (Creep.carry.energy == Creep.carryCapacity)
         {
-            if (Creep.memory.gather)
+            if (Creep.memory.Task == HarvCB.Harvest)
             {
                 Creep.memory.Target = null;
             }
-            Creep.memory.gather = false;
+            Creep.memory.Task = HarvCB.Store;
         }
         else if (Creep.carry.energy < 50)
         {
-            if (!Creep.memory.gather)
+            if (Creep.memory.Task == HarvCB.Store)
             {
                 Creep.memory.Target = null;
             }
-            Creep.memory.gather = true;
+            Creep.memory.Task = HarvCB.Harvest;
         }
-
-        if (Creep.memory.gather)
+    },
+    RunHarvest : function (Creep)
+    {
+        var Target = null;
+        if (!Creep.memory.Target)
         {
-            var Target = null;
-            if (!Creep.memory.Target)
-            {
-                Target = Creep.pos.findClosestByPath(HarvCB.GetHarvestTargets(Creep));
-                Creep.memory.Target = Target.id;
-            }
-            else
-            {
-                Target = Game.getObjectById(Creep.memory.Target);
-            }
+            Target = Creep.pos.findClosestByPath(HarvCB.GetHarvestTargets(Creep));
+            Creep.memory.Target = Target.id;
+        }
+        else
+        {
+            Target = Game.getObjectById(Creep.memory.Target);
+        };
 
-            switch(Creep.harvest(Target))
+        switch(Creep.harvest(Target))
+        {
+            case ERR_INVALID_TARGET:
+                Creep.pickup(Target);
+            case ERR_NOT_IN_RANGE:
+                Creep.moveTo(Target);
+            default:
+                Creep.memory.Target = null;
+        }
+    },
+
+    RunStore : function(Creep)
+    {
+        var Target = null;
+        if (!Creep.memory.Target)
+        {
+            var Targets = HarvCB.GetStorageTargets(Creep);
+            var Priority = Targets.filter(function(obj) {
+                    return ((obj.structureType == STRUCTURE_SPAWN) ||
+                            (obj.structureType == STRUCTURE_EXTENSION)) &&
+                            (obj.energy < obj.energyCapacity);
+                });
+            if (Priority.length == 0)
             {
-                case ERR_INVALID_TARGET:
-                    Creep.pickup(Target);
-                case ERR_NOT_IN_RANGE:
-                default:
-                    Creep.moveTo(Target);
+                var Priority = Targets.filter(function(obj) {
+                        return (obj.structureType == STRUCTURE_TOWER) &&
+                                (obj.energy < obj.energyCapacity);
+                });
+                if (Priority.length == 0)
+                {
+                    var Priorty = [Creep.room.storage];
+                }
+            }
+            Target = Creep.pos.findClosestByPath(Priority);
+            if (Target)
+            {
+                Creep.memory.Target = Target.id;
             }
 
         }
         else
         {
-            var Target = null;
-            if (!Creep.memory.Target)
-            {
-                var Targets = HarvCB.GetStorageTargets(Creep);
-                var Priority = Targets.filter(function(obj) {
-                        return ((obj.structureType == STRUCTURE_SPAWN) ||
-                                (obj.structureType == STRUCTURE_EXTENSION)) &&
-                                (obj.energy < obj.energyCapacity);
-                    });
-                if (Priority.length == 0)
-                {
-                    var Priority = Targets.filter(function(obj) {
-                            return (obj.structureType == STRUCTURE_TOWER) &&
-                                    (obj.energy < obj.energyCapacity);
-                    });
-                    if (Priority.length == 0)
-                    {
-                        var Priorty = [Creep.room.storage];
-                    }
-                }
-                Target = Creep.pos.findClosestByPath(Priority);
-                if (Target)
-                {
-                    Creep.memory.Target = Target.id;
-                }
+            Target = Game.getObjectById(Creep.memory.Target);
+        }
 
-            }
-            else
-            {
-                Target = Game.getObjectById(Creep.memory.Target);
-            }
+        if (Creep.transfer(Target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE)
+        {
+            Creep.moveTo(Target);
+        }
+    },
 
-            if (Creep.transfer(Target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE)
-            {
-                Creep.moveTo(Target);
-            }
+    Run : function(Creep)
+    {
+        this.AssignTask(Creep);
+        switch (Creep.memory.Task)
+        {
+            case HarvCB.Harvest:
+                this.RunHarvest(Creep);
+                break;
+            case HarvCB.Store:
+                this.RunStore(Creep);
+                break;
+            default:
+                HarvCB.RunIdle(Creep);
+                break;
         }
     }
 };
