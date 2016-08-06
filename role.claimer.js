@@ -38,7 +38,23 @@ module.exports = {
                     }
                     else
                     {
-                        creep.memory.task = 'ClaimStore';
+                        var stor = creep.room.find(FIND_STRUCTURES, {
+                            filter : (obj) => {
+                                return ((obj.structureType == STRUCTURE_SPAWN) ||
+                                        (obj.structureType == STRUCTURE_EXTENSION) ||
+                                        (obj.structureType == STRUCTURE_STORAGE) ||
+                                        (obj.structureType == STRUCTURE_TOWER)) &&
+                                        obj.energy < obj.energyCapacity;
+                            }
+                        });
+                        if (stor.length > 0)
+                        {
+                            creep.memory.task = 'ClaimStore';
+                        }
+                        else
+                        {
+                            creep.memory.task = 'ClaimUpgrade';
+                        }
                     }
                 }
             }
@@ -76,6 +92,27 @@ module.exports = {
         {
             creep.upgradeController(creep.room.controller);
             creep.moveTo(creep.room.controller);
+        }
+        else if (creep.memory.task == 'ClaimStore')
+        {
+            var stor = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                filter : (obj) => {
+                    return ((obj.structureType == STRUCTURE_SPAWN) ||
+                            (obj.structureType == STRUCTURE_EXTENSION)) &&
+                            obj.energy < obj.energyCapacity;
+                }
+            });
+            if (stor)
+            {
+                creep.transfer(stor, RESOURCE_ENERGY);
+                creep.moveTo(stor);
+            }
+            else
+            {
+                creep.memory.task = 'ClaimUpgrade';
+                creep.moveTo(creep.room.controller);
+            }
+
         }
     }
 
