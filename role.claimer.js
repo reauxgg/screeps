@@ -31,8 +31,8 @@ module.exports = {
                 }
                 else
                 {
-                    target = creep.pos.findClosestByPath(FIND_STRCUTURES, {
-                        filter : (obj) : {
+                    target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                        filter : (obj) => {
                             return (obj.structureType == STRUCTURE_ROAD) &&
                                     obj.hits < (obj.hitsMax/1.3);
                         }
@@ -127,6 +127,11 @@ module.exports = {
                 creep.moveTo(creep.room.controller);
             }
 
+        }
+        else if (creep.memory.task == 'ClaimRepair')
+        {
+            creep.repair(target);
+            creep.moveTo(target);
         }
     }
 
