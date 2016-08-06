@@ -25,7 +25,7 @@ module.exports = {
 
             if (creep.carry.energy == creep.carryCapacity)
             {
-                if (creep.room.controller.ticksToDowngrade < 5000)
+                if (creep.room.controller.ticksToDowngrade < 1000)
                 {
                     creep.memory.task = 'ClaimUpgrade';
                 }
