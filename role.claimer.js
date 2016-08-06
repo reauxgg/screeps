@@ -31,31 +31,45 @@ module.exports = {
                 }
                 else
                 {
-                    target = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
+                    target = creep.pos.findClosestByPath(FIND_STRCUTURES, {
+                        filter : (obj) : {
+                            return (obj.structureType == STRUCTURE_ROAD) &&
+                                    obj.hits < (obj.hitsMax/1.3);
+                        }
+                    });
                     if (target)
                     {
-                        creep.memory.task = 'ClaimBuilder';
+                        creep.memory.task = 'ClaimRepair'
                     }
                     else
                     {
-                        var stor = creep.room.find(FIND_STRUCTURES, {
-                            filter : (obj) => {
-                                return ((obj.structureType == STRUCTURE_SPAWN) ||
-                                        (obj.structureType == STRUCTURE_EXTENSION) ||
-                                        (obj.structureType == STRUCTURE_STORAGE) ||
-                                        (obj.structureType == STRUCTURE_TOWER)) &&
-                                        obj.energy < obj.energyCapacity;
-                            }
-                        });
-                        if (stor.length > 0)
+                        target = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
+                        if (target)
                         {
-                            creep.memory.task = 'ClaimStore';
+                            creep.memory.task = 'ClaimBuilder';
                         }
                         else
                         {
-                            creep.memory.task = 'ClaimUpgrade';
+                            var stor = creep.room.find(FIND_STRUCTURES, {
+                                filter : (obj) => {
+                                    return ((obj.structureType == STRUCTURE_SPAWN) ||
+                                            (obj.structureType == STRUCTURE_EXTENSION) ||
+                                            (obj.structureType == STRUCTURE_STORAGE) ||
+                                            (obj.structureType == STRUCTURE_TOWER)) &&
+                                            obj.energy < obj.energyCapacity;
+                                }
+                            });
+                            if (stor.length > 0)
+                            {
+                                creep.memory.task = 'ClaimStore';
+                            }
+                            else
+                            {
+                                creep.memory.task = 'ClaimUpgrade';
+                            }
                         }
                     }
+
                 }
             }
 
