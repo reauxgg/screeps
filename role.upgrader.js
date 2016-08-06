@@ -18,16 +18,7 @@ var roleUpgrader = {
         }
         else
         {
-            var dropped = creep.pos.findClosestByPath(FIND_DROPPED_ENERGY);
-            if (dropped)
-            {
-                if(creep.pickup(dropped) == ERR_NOT_IN_RANGE)
-                {
-                    creep.moveTo(dropped);
-                }
-            }
-            else
-            {
+
                 var container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                         filter : (structure) => {
                             return (structure.structureType == STRUCTURE_STORAGE) && (structure.store[RESOURCE_ENERGY] > 300)
@@ -51,7 +42,7 @@ var roleUpgrader = {
                         }
                     }
                 }
-            }
+
 
         }
 	}

@@ -8,7 +8,7 @@ var roleRepairer = {
     run: function(creep) {
         if(creep.carry.energy == creep.carryCapacity)
         {
-            creep.memory.reparing = true;
+            creep.memory.repairing = true;
         }
 
         if (creep.carry.energy == 0)
@@ -77,20 +77,31 @@ var roleRepairer = {
         }
         else
         {
-            if (creep.transfer(creep.room.storage) == ERR_NOT_IN_RANGE)
-            {
-                creep.moveTo(creep.room.storage);
-            }
-            else {
-                var source = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE)
-                if (source)
+            var dropped = creep.pos.findClosestByPath(FIND_DROPPED_ENERGY);
+	        if (dropped)
+	        {
+	            if (creep.pickup(dropped) == ERR_NOT_IN_RANGE)
+	            {
+	                creep.moveTo(dropped);
+	            }
+	        }
+	        else
+	        {
+                if (creep.transfer(creep.room.storage) == ERR_NOT_IN_RANGE)
                 {
-                    if(creep.harvest(source) == ERR_NOT_IN_RANGE)
+                    creep.moveTo(creep.room.storage);
+                }
+                else {
+                    var source = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE)
+                    if (source)
                     {
-                        creep.moveTo(source);
+                        if(creep.harvest(source) == ERR_NOT_IN_RANGE)
+                        {
+                            creep.moveTo(source);
+                        }
                     }
                 }
-            }
+	        }
         }
     }
 };

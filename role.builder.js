@@ -30,6 +30,7 @@ var roleBuilder = {
             }
 	    }
 	    else {
+	        creep.moveTo(Game.flags.Claimers);
 	        var container = creep.pos.findClosestByPath(FIND_STRUCTURES, {filter : (structure) => {
                         return (structure.structureType == STRUCTURE_STORAGE) && (structure.store[RESOURCE_ENERGY] >= creep.energyCapacity)} });
 	        if (container)
@@ -40,7 +41,7 @@ var roleBuilder = {
 	            }
 	        }
 	        else {
-	            var source = creep.pos.findClosestByPath(FIND_SOURCES);
+	            var source = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
 	            if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(source);
                 }
