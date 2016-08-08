@@ -41,6 +41,10 @@ var roleUpgrader = {
                             creep.moveTo(source);
                         }
                     }
+                    else
+                    {
+                        creep.memory.upgrading = true;
+                    }
                 }
 
 

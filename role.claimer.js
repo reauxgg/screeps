@@ -25,12 +25,14 @@ module.exports = {
 
             if (creep.carry.energy == creep.carryCapacity)
             {
+                /*
                 if (creep.room.controller.ticksToDowngrade < 1000)
                 {
-                    creep.memory.task = 'ClaimUpgrade';
+                    creep.memory.task = 'ClaimStore';
                 }
                 else
                 {
+                */
                     target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                         filter : (obj) => {
                             return (obj.structureType == STRUCTURE_ROAD) &&
@@ -56,9 +58,8 @@ module.exports = {
                                             (obj.structureType == STRUCTURE_EXTENSION) ||
                                             (obj.structureType == STRUCTURE_STORAGE) ||
                                             (obj.structureType == STRUCTURE_TOWER)) &&
-                                            obj.energy < obj.energyCapacity;
-                                }
-                            });
+                                            (obj.energy < obj.energyCapacity);
+                                }});
                             if (stor.length > 0)
                             {
                                 creep.memory.task = 'ClaimStore';
@@ -70,15 +71,18 @@ module.exports = {
                         }
                     }
 
-                }
+                //}
             }
             if (creep.memory.task == 'ClaimBuilder')
             {
                 target = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
                 console.log(target);
-                if (creep.build(target) == ERR_NOT_IN_RANGE)
+                if (target)
                 {
-                    creep.moveTo(target);
+                    if (creep.build(target) == ERR_NOT_IN_RANGE || creep.build(target) == OK)
+                    {
+                        creep.moveTo(target);
+                    }
                 }
                 else
                 {
@@ -109,18 +113,19 @@ module.exports = {
             }
             else if (creep.memory.task == 'ClaimStore')
             {
-                var storage = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                var stor = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                     filter : (obj) => {
                         return ((obj.structureType == STRUCTURE_SPAWN) ||
-                                (obj.structureType == STRUCTURE_EXTENSION)) &&
-                                obj.energy < obj.energyCapacity;
+                                (obj.structureType == STRUCTURE_EXTENSION) ||
+                                (obj.structureType == STRUCTURE_TOWER)) &&
+                                (obj.energy < obj.energyCapacity);
                     }
                 });
-                if (storage)
+                if (stor)
                 {
-                    if (creep.transfer(storage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE)
+                    if (creep.transfer(stor, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE)
                     {
-                        creep.moveTo(storage);
+                        creep.moveTo(stor);
                     }
                 }
                 else

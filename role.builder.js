@@ -28,6 +28,16 @@ var roleBuilder = {
                     creep.moveTo(targets[0]);
                 }
             }
+            else
+            {
+                if (creep.room.storage)
+                {
+                    if(creep.transfer(creep.room.storage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE)
+                    {
+                        creep.moveTo(creep.room.storage);
+                    }
+                }
+            }
 	    }
 	    else {
 	        var container = creep.room.storage;
