@@ -113,9 +113,13 @@ module.exports.loop = function () {
 
 //Tower defense
 
-    var towers = Room.find(FIND_STRUCTURES, {
+    var towers1 = Room.find(FIND_STRUCTURES, {
         filter: (s) => s.structureType == STRUCTURE_TOWER
     });
+    var towers2 = Game.rooms.W22S49.find(FIND_STRUCTURES, {
+        filter: (s) => s.structureType == STRUCTURE_TOWER
+    });
+    var towers = towers1.concat(towers2);
     for (let tower of towers) {
         var target = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
         if (target) {

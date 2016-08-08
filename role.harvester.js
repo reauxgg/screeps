@@ -25,7 +25,41 @@ var roleHarvester = {
                 }
                 else
                 {
-                    creep.memory.return = true;
+                    var spawnpower = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                        filter : (obj) => {
+                            return ((obj.structureType == STRUCTURE_SPAWN) ||
+                                    (obj.StructureType == STRUCTURE_EXTENSION)) &&
+                                    (obj.energy < obj.energyCapacity);
+                        }
+                    });
+                    if (spawnpower)
+                    {
+                        if(creep.withdraw(creep.room.storage, RESOURCE_ENERGY))
+                        {
+                            creep.moveTo(creep.room.storage);
+                        }
+                    }
+                    else
+                    {
+                        if (creep.energy > 0)
+                        {
+                            creep.memory.return = true;
+                        }
+                        else
+                        {
+                            var sources = creep.room.find(FIND_SOURCES);
+                            lowest = sources[0];
+                            for (let source of sources)
+                            {
+                                if (source.ticksToRegeneration < lowest.ticksToRegeneration)
+                                {
+                                    lowest = source;
+                                }
+                            }
+                            creep.moveTo(lowest);
+                        }
+                    }
+
                 }
         }
 
