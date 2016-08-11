@@ -44,7 +44,7 @@ var roleBuilder = {
 	        var sites = creep.room.find(FIND_CONSTRUCTION_SITES);
 	        if (sites.length > 0)
 	        {
-                    if (container && container.energy > 0)
+                    if (container && (container.store[RESOURCE_ENERGY] > 0))
                    {
         	            if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE)
         	            {

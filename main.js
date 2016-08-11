@@ -4,7 +4,7 @@ var bCap = 1;
 var rCap = 1;
 var uCap = 1;
 var cCap = 3;
-var dCap = 3;
+var dCap = 1;
 
 //var body = [WORK,CARRY,MOVE];
 //var body = [WORK,WORK,WORK,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE];
@@ -55,44 +55,45 @@ module.exports.loop = function () {
     console.log('Pop:' + population + ' - H:' + harvesters.length + '/' + hCap + ' - R:' + repairers.length + '/' + rCap + ' - B:' + builders.length + '/' + bCap + ' - U:' + upgraders.length + '/' + uCap + ' ......... Enrgy:' + TotalEnergy + '/' + MaxEnergy);
     console.log('Claimers: ' + claimers);
 
+    var newName = '';
 //Checking to see if new spawns are needed
     if (harvesters.length < hCap) {
-        var newName = Game.spawns['Spawn1'].createCreep(maxBody, 'H' + Memory.cNum, {role: 'harvester'});
+        newName = Game.spawns.Spawn1.createCreep(maxBody, 'H' + Memory.cNum, {role: 'harvester'});
         console.log('Spawning new harvester: ' + newName);
         Memory.cNum++;
     }
     else if (upgraders.length < uCap) {
-        var newName = Game.spawns['Spawn1'].createCreep(body, 'U' + Memory.cNum, {role: 'upgrader'});
+        newName = Game.spawns.Spawn1.createCreep(body, 'U' + Memory.cNum, {role: 'upgrader'});
         console.log('Spawning new upgrader: ' + newName);
         Memory.cNum++;
     }
     else if (builders.length < bCap) {
-        var newName = Game.spawns['Spawn1'].createCreep(body, 'B' + Memory.cNum, {role: 'builder'});
+        newName = Game.spawns.Spawn1.createCreep(body, 'B' + Memory.cNum, {role: 'builder'});
         console.log('Spawning new builder: ' + newName);
         Memory.cNum++;
     }
     else if (repairers.length < rCap) {
-        var newName = Game.spawns['Spawn1'].createCreep(body, 'R' + Memory.cNum, {role: 'repairer'});
+        newName = Game.spawns.Spawn1.createCreep(body, 'R' + Memory.cNum, {role: 'repairer'});
         console.log('Spawning new repairer: ' + newName);
         Memory.cNum++;
     }
     else if (claimers.length < cCap) {
-        var newName = Game.spawns['Spawn1'].createCreep(claimBody, 'C' + Memory.cNum, {role: 'claimer'});
+        newName = Game.spawns.Spawn1.createCreep(claimBody, 'C' + Memory.cNum, {role: 'claimer'});
         console.log('Spawning new claimer: ' + newName);
         Memory.cNum++;
     }
 
     if (defenders.length < dCap)
     {
-        var newName = Game.spawns['Spawn2'].createCreep(defender, 'D' + Memory.cNum, {role: 'defender'});
+        newName = Game.spawns.Spawn2.createCreep(defender, 'D' + Memory.cNum, {role: 'defender'});
         console.log('Spawning new defender: ' + newName);
         Memory.cNum++;
     }
 
 
 //Telling each creep what to do
-    for (var name in Game.creeps) {
-        var creep = Game.creeps[name];
+    for (var creepname in Game.creeps) {
+        var creep = Game.creeps[creepname];
         if (creep.memory.role == 'harvester') {
             roleHarvester.run(creep);
         }

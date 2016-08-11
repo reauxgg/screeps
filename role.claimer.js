@@ -40,7 +40,7 @@ module.exports = {
                                 }});
                     if (stor)
                     {
-                        creep.memory.task = 'ClaimStore'
+                        creep.memory.task = 'ClaimStore';
                     }
                     else
                     {
