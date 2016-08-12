@@ -34,21 +34,43 @@ Creeps jobs
     Transfer minerals to lab
 
 */
+
+function RoomInit(Harvs, Builds, Ups, Reps, Claims, Miners, Level, Minerals)
+{
+    this.hCap = Harvs;
+    this.bCap = Builds;
+    this.uCap = Ups;
+    this.cCap = Claims;
+    this.mCap = Miners;
+    this.Level = Level;
+    this.MineralType = Minerals;
+}
+
 var MyRooms = ['W22S49', 'W23S49'];
 
-function MyRoom (void)
+function CheckRoomMem(RoomName)
 {
-    this.memory.HarvCap = 1;
-    this.memory.BuildCap = 1;
-    this.memory.UpgradeCap = 1;
-    this.memory.RepairCap = 1;
-    this.memory.MinerCap = 1;
+    if (!Memory.hasOwnProperty(RoomName))
+    {
+        var mineral = Game.rooms[RoomName].find(FIND_MINERALS);
+        if (mineral.length > 0)
+        {
+            mineral = mineral[0].mineralType;
+        }
+        else
+        {
+            mineral = null;
+        }
+        Memory[RoomName] = new RoomInit(1,1,1,1,1,1,1,mineral);
+    }
 }
+
 module.exports.loop = function ()
 {
+    // Check Room variables
     for (var RoomName in MyRooms)
     {
-        var Room = Game.rooms[RoomName];
+        CheckRoomMem(RoomName);
 
     }
 
