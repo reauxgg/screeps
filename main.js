@@ -4,7 +4,7 @@ var bCap = 1;
 var rCap = 1;
 var uCap = 1;
 var cCap = 3;
-var dCap = 1;
+var dCap = 0;
 
 //var body = [WORK,CARRY,MOVE];
 //var body = [WORK,WORK,WORK,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE];
@@ -78,7 +78,7 @@ module.exports.loop = function () {
         Memory.cNum++;
     }
     else if (claimers.length < cCap) {
-        newName = Game.spawns.Spawn1.createCreep(claimBody, 'C' + Memory.cNum, {role: 'claimer'});
+        newName = Game.spawns.Spawn2.createCreep(claimBody, 'C' + Memory.cNum, {role: 'claimer'});
         console.log('Spawning new claimer: ' + newName);
         Memory.cNum++;
     }
