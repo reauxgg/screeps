@@ -9,6 +9,11 @@ Memory.RoomName Object = {
     Level : 0,
     MaxEnergy : 300,
     Mineral : RESOURCE_HYDROGEN,
+    Paths : {
+        StartObjId : {
+            TargetObjId : PathObj,
+        }
+    }
 }
 
 For each room...
