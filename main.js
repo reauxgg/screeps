@@ -1,8 +1,8 @@
 // Adjust population caps here
 var hCap = 2;
-var bCap = 1;
+var bCap = 2;
 var rCap = 1;
-var uCap = 1;
+var uCap = 2;
 var cCap = 3;
 var dCap = 0;
 
@@ -12,7 +12,8 @@ var maxBody = [MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,
                WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,
 	       CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY];
 var body = maxBody;//[WORK,WORK,WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE];
-var claimBody = [WORK,WORK,WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE];
+//var claimBody = [WORK,WORK,WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE];
+var claimBody = [WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE];
 var healer = [HEAL,HEAL,MOVE,MOVE,MOVE,MOVE];
 var fighter = [RANGED_ATTACK, RANGED_ATTACK, MOVE,MOVE,MOVE,MOVE];
 var defender = [ATTACK, ATTACK, MOVE,MOVE];
@@ -52,7 +53,7 @@ module.exports.loop = function () {
 
 //These need to be adjusted at the start of a room to WORK,CARRY,MOVE
     console.log('-------------------------');
-    console.log('Pop:' + population + ' - H:' + harvesters.length + '/' + hCap + ' - R:' + repairers.length + '/' + rCap + ' - B:' + builders.length + '/' + bCap + ' - U:' + upgraders.length + '/' + uCap + ' ......... Enrgy:' + TotalEnergy + '/' + MaxEnergy);
+    console.log('Pop:' + population + ' H:' + harvesters.length + '/' + hCap + ' R:' + repairers.length + '/' + rCap + ' B:' + builders.length + '/' + bCap + ' U:' + upgraders.length + '/' + uCap +  ' C:' + claimers.length +'/'+cCap + '... Enrgy:' + TotalEnergy + '/' + MaxEnergy);
     console.log('Claimers: ' + claimers);
 
     var newName = '';
@@ -135,7 +136,7 @@ module.exports.loop = function () {
             var closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
                 filter: (structure) => ((structure.structureType == STRUCTURE_WALL ||
                                         structure.structureType == STRUCTURE_RAMPART) &&
-                                        structure.hits < 125000) ||
+                                        structure.hits < 250000) ||
                                         ((structure.structureType == STRUCTURE_ROAD) &&
                                         structure.hits < (structure.hitsMax / 1.3))
             });

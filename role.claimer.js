@@ -26,6 +26,7 @@ module.exports = {
             if (creep.carry.energy == creep.carryCapacity)
             {
 
+
                 if (creep.room.controller.ticksToDowngrade < 1000)
                 {
                     console.log("Emergency upgrade!" + creep.room.controller.ticksToDowngrade);
@@ -35,12 +36,24 @@ module.exports = {
                 {
                     var stor = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                                 filter : (obj) => {
-                                    return (obj.structureType == STRUCTURE_TOWER) &&
+                                    return ((obj.structureType == STRUCTURE_SPAWN) ||
+                                            (obj.structureType == STRUCTURE_EXTENSION)) &&
                                             (obj.energy < obj.energyCapacity);
+                                }});
+                    if(stor)
+                    {
+                        creep.memory.task = 'ClaimStore';
+                    }
+                    else
+                    {
+                        stor = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                                filter : (obj) => {
+                                    return (obj.structureType == STRUCTURE_TOWER) &&
+                                            (obj.energy < 300);
                                 }});
                     if (stor)
                     {
-                        creep.memory.task = 'ClaimStore';
+                        creep.memory.task = 'ClaimTower';
                     }
                     else
                     {
@@ -67,8 +80,7 @@ module.exports = {
                                     filter : (obj) => {
                                         return ((obj.structureType == STRUCTURE_SPAWN) ||
                                                 (obj.structureType == STRUCTURE_EXTENSION) ||
-                                                (obj.structureType == STRUCTURE_STORAGE) ||
-                                                (obj.structureType == STRUCTURE_TOWER)) &&
+                                                (obj.structureType == STRUCTURE_STORAGE)) &&
                                                 (obj.energy < obj.energyCapacity);
                                     }});
                                 if (stor.length > 0)
@@ -77,12 +89,27 @@ module.exports = {
                                 }
                                 else
                                 {
-                                    console.log('When all else fails, UPGRADE!');
-                                    creep.memory.task = 'ClaimUpgrade';
+                                    stor = creep.room.find(FIND_STRUCTURES, {
+                                    filter : (obj) => {
+                                        return ((obj.structureType == STRUCTURE_TOWER) &&
+                                                (obj.energy < obj.energyCapacity));
+                                        }});
+                                    if (stor.length > 0)
+                                    {
+                                        creep.memory.task = 'ClaimTower';
+                                    }
+                                    else
+                                    {
+                                        console.log('When all else fails, UPGRADE!');
+                                        creep.memory.task = 'ClaimUpgrade';
+                                    }
+
                                 }
                             }
                         }
                     }
+                    }
+
                 }
                 console.log(creep.name + " switching to " + creep.memory.task);
             }
@@ -127,9 +154,14 @@ module.exports = {
             }
             else if (creep.memory.task == 'ClaimUpgrade')
             {
+                console.log(creep.upgradeController(creep.room.controller));
                 if (creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE)
                 {
                     creep.moveTo(creep.room.controller);
+                }
+                else
+                {
+
                 }
 
             }
@@ -139,7 +171,30 @@ module.exports = {
                     filter : (obj) => {
                         return ((obj.structureType == STRUCTURE_SPAWN) ||
                                 (obj.structureType == STRUCTURE_EXTENSION) ||
-                                (obj.structureType == STRUCTURE_TOWER)) &&
+                                 (obj.structureType == STRUCTURE_STORAGE)) &&
+                                (obj.energy < obj.energyCapacity);
+                    }
+                });
+                if (stor)
+                {
+                    if (creep.transfer(stor, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE)
+                    {
+                        creep.moveTo(stor);
+                    }
+                }
+                else
+                {
+                    console.log("Everything's full, going to upgrade");
+                    creep.memory.task = 'ClaimUpgrade';
+                    creep.moveTo(creep.room.controller);
+                }
+
+            }
+            else if (creep.memory.task == 'ClaimTower')
+            {
+                var stor = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                    filter : (obj) => {
+                        return (obj.structureType == STRUCTURE_TOWER) &&
                                 (obj.energy < obj.energyCapacity);
                     }
                 });
