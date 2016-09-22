@@ -19,6 +19,17 @@ var HarvBody = {
     Level6 : [  WORK,WORK,WORK,WORK,
                 CARRY,CARRY,CARRY,CARRY,CARRY,
                 MOVE,MOVE,MOVE,MOVE,MOVE],
+    Level7 : [  WORK, WORK, WORK, WORK, WORK,
+                WORK, WORK, WORK, WORK, WORK,
+                WORK, WORK, WORK, WORK, WORK,
+                WORK, WORK, WORK, WORK, WORK,
+                CARRY,CARRY,CARRY,CARRY,CARRY,
+                CARRY,CARRY,CARRY,CARRY,CARRY,
+                CARRY,CARRY,CARRY,
+                MOVE, MOVE, MOVE, MOVE, MOVE,
+                MOVE, MOVE, MOVE, MOVE, MOVE,
+                MOVE, MOVE, MOVE, MOVE, MOVE,
+                MOVE, MOVE],
 };
 
 
@@ -49,6 +60,10 @@ var Harvester =
         if (level <= HarvRL.Level6)
         {
             return HarvBody.Level6;
+        }
+         if (level <= HarvRL.Level7)
+        {
+            return HarvBody.Level7;
         }
 
         return HarvBody.Level1;
@@ -89,7 +104,7 @@ var Harvester =
             }
             Creep.memory.Task = HarvCB.Store;
         }
-        else if (Creep.carry.energy < 50)
+        else if (Creep.carry.energy == 0)
         {
             if (Creep.memory.Task == HarvCB.Store)
             {
@@ -104,19 +119,38 @@ var Harvester =
         if (!Creep.memory.Target)
         {
             Target = Creep.pos.findClosestByPath(HarvCB.GetHarvestTargets(Creep));
-            Creep.memory.Target = Target.id;
+            if (Target)
+            {
+                Creep.memory.Target = Target.id;
+            }
         }
         else
         {
             Target = Game.getObjectById(Creep.memory.Target);
         };
 
+        if (Target == null)
+        {
+            if (Creep.room.energyAvailable < Creep.room.energyCapacityAvailable)
+            {
+                if (Creep.room.storage)
+                {
+                    Creep.memory.Target = Creep.room.storage.id;
+                    Target = Game.getObjectById(Creep.memory.Target);
+                }
+            }
+        }
+
         switch(Creep.harvest(Target))
         {
             case ERR_INVALID_TARGET:
+                // It's either dropped energy or storage...
                 Creep.pickup(Target);
+                Creep.withdraw(Target, RESOURCE_ENERGY);
+                // FAll through, to move towards non-source targets
             case ERR_NOT_IN_RANGE:
                 Creep.moveTo(Target);
+                break;
             default:
                 Creep.memory.Target = null;
         }
@@ -135,13 +169,13 @@ var Harvester =
                 });
             if (Priority.length == 0)
             {
-                var Priority = Targets.filter(function(obj) {
+                Priority = Targets.filter(function(obj) {
                         return (obj.structureType == STRUCTURE_TOWER) &&
                                 (obj.energy < obj.energyCapacity);
                 });
                 if (Priority.length == 0)
                 {
-                    var Priorty = [Creep.room.storage];
+                    Priority = [Creep.room.storage,];
                 }
             }
             Target = Creep.pos.findClosestByPath(Priority);

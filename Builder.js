@@ -1,12 +1,12 @@
 var BuildCB = require('CreepBase');
 var BuildRL = require('RoomLevels');
 var BuildBody = {
-    Level1 : [  WORK,
+    Level1 : [  WORK,WORK,
                 CARRY,
                 MOVE],
     Level2 : [  WORK,WORK,
-                CARRY,CARRY,
-                MOVE,MOVE],
+                CARRY,CARRY,CARRY,CARRY,
+                MOVE,MOVE,MOVE,],
     Level3 : [  WORK,WORK,WORK,
                 CARRY,CARRY,CARRY,
                 MOVE,MOVE,MOVE],
@@ -16,12 +16,24 @@ var BuildBody = {
     Level5 : [  WORK,WORK,WORK,WORK,
                 CARRY,CARRY,CARRY,CARRY,CARRY,
                 MOVE,MOVE,MOVE,MOVE,MOVE],
-    Level6 : [  WORK,WORK,WORK,WORK,
+    Level6 : [  WORK,WORK,WORK,WORK,WORK,
+                WORK,WORK,WORK,WORK,WORK,
                 CARRY,CARRY,CARRY,CARRY,CARRY,
                 MOVE,MOVE,MOVE,MOVE,MOVE],
+    Level7 : [  WORK, WORK, WORK, WORK, WORK,
+                WORK, WORK, WORK, WORK, WORK,
+                WORK, WORK, WORK, WORK, WORK,
+                WORK, WORK, WORK, WORK, WORK,
+                CARRY,CARRY,CARRY,CARRY,CARRY,
+                CARRY,CARRY,CARRY,CARRY,CARRY,
+                CARRY,CARRY,CARRY,
+                MOVE, MOVE, MOVE, MOVE, MOVE,
+                MOVE, MOVE, MOVE, MOVE, MOVE,
+                MOVE, MOVE, MOVE, MOVE, MOVE,
+                MOVE, MOVE],
 };
 
-var roleUpgrader = {
+var roleBuilder = {
     GetBody : function(level)
     {
         if (level <= BuildRL.Level1)
@@ -47,6 +59,10 @@ var roleUpgrader = {
         if (level <= BuildRL.Level6)
         {
             return BuildBody.Level6;
+        }
+        if (level <= BuildRL.Level7)
+        {
+            return BuildBody.Level7;
         }
 
         return BuildBody.Level1;
@@ -82,8 +98,16 @@ var roleUpgrader = {
         var Target = null;
         if (!Creep.memory.Target)
         {
-            Target = Creep.pos.findClosestByPath(BuildCB.GetHarvestTargets(Creep));
-            Creep.memory.Target = Target.id;
+            if (Creep.room.storage)
+            {
+                Creep.memory.Target = Creep.room.storage.id;
+            }
+            else
+            {
+                Target = Creep.pos.findClosestByPath(BuildCB.GetHarvestTargets(Creep));
+                Creep.memory.Target = Target.id;
+            }
+
         }
         else
         {
@@ -133,9 +157,9 @@ var roleUpgrader = {
             case BuildCB.Harvest:
                 if (Creep.room.storage)
                 {
-                    if (Creep.transfer(Creep.room.storage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE)
+                    if (Creep.withdraw(Creep.room.storage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE)
                     {
-                        Creep.moveTo(Creep.room.stoage);
+                        Creep.moveTo(Creep.room.storage);
                     }
                 }
                 else
@@ -146,4 +170,4 @@ var roleUpgrader = {
     }
 };
 
-module.exports = roleUpgrader;
+module.exports = roleBuilder;

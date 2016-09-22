@@ -1,12 +1,12 @@
 var UpCB = require('CreepBase');
 var UpRL = require('RoomLevels');
 var UpBody = {
-    Level1 : [  WORK,
+    Level1 : [  WORK,WORK,
                 CARRY,
                 MOVE],
     Level2 : [  WORK,WORK,
-                CARRY,CARRY,
-                MOVE,MOVE],
+                CARRY,CARRY,CARRY,
+                MOVE,MOVE,MOVE,MOVE],
     Level3 : [  WORK,WORK,WORK,
                 CARRY,CARRY,CARRY,
                 MOVE,MOVE,MOVE],
@@ -19,6 +19,17 @@ var UpBody = {
     Level6 : [  WORK,WORK,WORK,WORK,
                 CARRY,CARRY,CARRY,CARRY,CARRY,
                 MOVE,MOVE,MOVE,MOVE,MOVE],
+    Level7 : [  WORK, WORK, WORK, WORK, WORK,
+                WORK, WORK, WORK, WORK, WORK,
+                WORK, WORK, WORK, WORK, WORK,
+                WORK, WORK, WORK, WORK, WORK,
+                CARRY,CARRY,CARRY,CARRY,CARRY,
+                CARRY,CARRY,CARRY,CARRY,CARRY,
+                CARRY,CARRY,CARRY,CARRY,
+                MOVE, MOVE, MOVE, MOVE, MOVE,
+                MOVE, MOVE, MOVE, MOVE, MOVE,
+                MOVE, MOVE, MOVE, MOVE, MOVE,
+                MOVE],
 };
 
 var roleUpgrader = {
@@ -47,6 +58,10 @@ var roleUpgrader = {
         if (level <= UpRL.Level6)
         {
             return UpBody.Level6;
+        }
+        if (level <= UpRL.Level7)
+        {
+            return UpBody.Level7;
         }
 
         return UpBody.Level1;
@@ -80,8 +95,9 @@ var roleUpgrader = {
     RunHarvest : function (Creep)
     {
         var Target = null;
-        if (!Creep.memory.Target)
+        if (Creep.memory.Target == null)
         {
+
             Target = Creep.pos.findClosestByPath(UpCB.GetHarvestTargets(Creep));
             Creep.memory.Target = Target.id;
         }
@@ -131,9 +147,9 @@ var roleUpgrader = {
             case UpCB.Harvest:
                 if (Creep.room.storage)
                 {
-                    if (Creep.transfer(Creep.room.storage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE)
+                    if (Creep.withdraw(Creep.room.storage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE)
                     {
-                        Creep.moveTo(Creep.room.stoage);
+                        Creep.moveTo(Creep.room.storage);
                     }
                 }
                 else

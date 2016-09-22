@@ -5,7 +5,7 @@ var Builder = require('Builder');
 var Towers = require('Towers');
 var Repairer = require('RepairBot');
 
-var HarvCap = 2;
+var HarvCap = 3;
 var BuildCap = 1;
 var RepCap = 1;
 var UpCap = 1;
@@ -77,7 +77,7 @@ module.exports.loop = function () {
         }
         else if (RepPop < RepCap)
         {
-            NewName = Game.spawns['Spawn1'].createCreep(Harvester.GetBody(MaxEnergy), 'R' + CreepCount, {role: 'repairer'});
+            NewName = Game.spawns['Spawn1'].createCreep(Harvester.GetBody(MaxEnergy), 'R' + CreepCount, {Role: CreepBase.Repair});
             console.log('Spawning new repairer: ' + NewName);
         }
         if (NewName == -3)
