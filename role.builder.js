@@ -20,7 +20,7 @@ var roleBuilder = {
 	    if(!creep.memory.building && creep.carry.energy == creep.carryCapacity) {
 	        creep.memory.building = true;
 	    }
-
+        
 	    if(creep.memory.building) {
 	        var targets = creep.room.find(FIND_CONSTRUCTION_SITES);
             if(targets.length > 0) {
@@ -51,6 +51,12 @@ var roleBuilder = {
         	                creep.moveTo(container);
         	            }
                    }
+                   else {
+	                    var source = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
+	                    if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
+                            creep.moveTo(source);
+                        }
+	                }
 	        }
 	        else {
 	            var source = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
@@ -58,6 +64,7 @@ var roleBuilder = {
                     creep.moveTo(source);
                 }
 	        }
+	        
 
 	    }
 	}

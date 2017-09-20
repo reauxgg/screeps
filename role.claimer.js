@@ -11,22 +11,19 @@ module.exports = {
     run : function (creep)
     {
         var target = null;
-        if (Game.flags.Claimers.room.name != creep.room.name)
+        
+        if (Game.flags.Claimers.room != creep.room)
         {
             creep.moveTo(Game.flags.Claimers);
-            if (Game.rooms[Game.flags.Claimers.room.name].controller.owner.username != creep.owner.username)
+            if (!(creep.room.controller.owner))
             {
-                creep.say(creep.room.controller.owner.username);
                 creep.claimController(creep.room.controller);
             }
          }
         else
         {
-
             if (creep.carry.energy == creep.carryCapacity)
             {
-
-
                 if (creep.room.controller.ticksToDowngrade < 1000)
                 {
                     console.log("Emergency upgrade!" + creep.room.controller.ticksToDowngrade);
@@ -34,85 +31,93 @@ module.exports = {
                 }
                 else
                 {
-                    var stor = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                    if (!(creep.room.controller.my))
+                    {
+                        creep.claimController(creep.room.controller)
+                        //creep.moveTo(creep.room.controller)
+                        creep.memory.task = "ClaimClaim";
+                    }
+                    else
+                    {
+                        var stor = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                                 filter : (obj) => {
                                     return ((obj.structureType == STRUCTURE_SPAWN) ||
                                             (obj.structureType == STRUCTURE_EXTENSION)) &&
                                             (obj.energy < obj.energyCapacity);
                                 }});
-                    if(stor)
-                    {
-                        creep.memory.task = 'ClaimStore';
-                    }
-                    else
-                    {
-                        stor = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                                filter : (obj) => {
-                                    return (obj.structureType == STRUCTURE_TOWER) &&
-                                            (obj.energy < 300);
-                                }});
-                    if (stor)
-                    {
-                        creep.memory.task = 'ClaimTower';
-                    }
-                    else
-                    {
-                        target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                        filter : (obj) => {
-                            return (obj.structureType == STRUCTURE_ROAD) &&
-                                    obj.hits < (obj.hitsMax/1.3);
-                        }
-                        });
-                        if (target)
+                        if(stor)
                         {
-                            creep.memory.task = 'ClaimRepair';
+                            creep.memory.task = 'ClaimStore';
                         }
                         else
                         {
-                            target = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
-                            if (target)
+                            stor = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                                    filter : (obj) => {
+                                        return (obj.structureType == STRUCTURE_TOWER) &&
+                                                (obj.energy < 300);
+                                    }});
+                            if (stor)
                             {
-                                creep.memory.task = 'ClaimBuilder';
+                                creep.memory.task = 'ClaimTower';
                             }
                             else
                             {
-                                var stor = creep.room.find(FIND_STRUCTURES, {
-                                    filter : (obj) => {
-                                        return ((obj.structureType == STRUCTURE_SPAWN) ||
-                                                (obj.structureType == STRUCTURE_EXTENSION) ||
-                                                (obj.structureType == STRUCTURE_STORAGE)) &&
-                                                (obj.energy < obj.energyCapacity);
-                                    }});
-                                if (stor.length > 0)
+                                target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                                filter : (obj) => {
+                                    return (obj.structureType == STRUCTURE_ROAD) &&
+                                            obj.hits < (obj.hitsMax/1.3);
+                                }
+                                });
+                                if (target)
                                 {
-                                    creep.memory.task = 'ClaimStore';
+                                    creep.memory.task = 'ClaimRepair';
                                 }
                                 else
                                 {
-                                    stor = creep.room.find(FIND_STRUCTURES, {
-                                    filter : (obj) => {
-                                        return ((obj.structureType == STRUCTURE_TOWER) &&
-                                                (obj.energy < obj.energyCapacity));
-                                        }});
-                                    if (stor.length > 0)
+                                    target = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
+                                    if (target)
                                     {
-                                        creep.memory.task = 'ClaimTower';
+                                        creep.memory.task = 'ClaimBuilder';
                                     }
                                     else
                                     {
-                                        console.log('When all else fails, UPGRADE!');
-                                        creep.memory.task = 'ClaimUpgrade';
+                                        stor = creep.room.find(FIND_STRUCTURES, {
+                                            filter : (obj) => {
+                                                return ((obj.structureType == STRUCTURE_SPAWN) ||
+                                                        (obj.structureType == STRUCTURE_EXTENSION) ||
+                                                        (obj.structureType == STRUCTURE_STORAGE)) &&
+                                                        (obj.energy < obj.energyCapacity);
+                                            }});
+                                        if (stor.length > 0)
+                                        {
+                                            creep.memory.task = 'ClaimStore';
+                                        }
+                                        else
+                                        {
+                                            stor = creep.room.find(FIND_STRUCTURES, {
+                                            filter : (obj) => {
+                                                return ((obj.structureType == STRUCTURE_TOWER) &&
+                                                        (obj.energy < obj.energyCapacity));
+                                                }});
+                                            if (stor.length > 0)
+                                            {
+                                                creep.memory.task = 'ClaimTower';
+                                            }
+                                            else
+                                            {
+                                                console.log('When all else fails, UPGRADE!');
+                                                creep.memory.task = 'ClaimUpgrade';
+                                            }
+                                        }
                                     }
-
                                 }
                             }
                         }
                     }
-                    }
-
                 }
                 console.log(creep.name + " switching to " + creep.memory.task);
             }
+            
             if (creep.memory.task == 'ClaimBuilder')
             {
                 target = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
@@ -223,6 +228,11 @@ module.exports = {
                 {
                     creep.memory.task = 'ClaimStore';
                 }
+            }
+            else if (creep.memory.task == "ClaimClaim")
+            {
+                creep.claimController(creep.room.controller)
+                creep.moveTo(creep.room.controller)
             }
         }
         if (creep.carry.energy === 0)

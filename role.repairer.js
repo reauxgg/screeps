@@ -64,20 +64,22 @@ var roleRepairer = {
                     // Go bank some power
                     var target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                         filter : obj => {
-                            return (obj.structureType == STRUCTURE_STORAGE);
+                            return ((obj.structureType == STRUCTURE_STORAGE) || (obj.structureType == STRUCTURE_SPAWN)  &&
+                            (obj.energy < obj.energyCapacity));
                         }
                     });
                     if (creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE)
                     {
                         creep.moveTo(target);
                     }
+                    
                 }
             }
 
         }
         else
         {
-            var dropped = creep.pos.findClosestByPath(FIND_DROPPED_ENERGY);
+            var dropped = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES);
 	        if (dropped)
 	        {
 	            if (creep.pickup(dropped) == ERR_NOT_IN_RANGE)

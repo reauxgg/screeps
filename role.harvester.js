@@ -29,7 +29,7 @@ var roleHarvester = {
             {
                 var spawnpower = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                     filter : (obj) => {
-                        return ((obj.structureType == STRUCTURE_SPAWN) ||
+                        return ((obj.StructureType == STRUCTURE_SPAWN) ||
                                 (obj.StructureType == STRUCTURE_EXTENSION)) &&
                                 (obj.energy < obj.energyCapacity);
                     }
@@ -88,8 +88,18 @@ var roleHarvester = {
                 if (!target)
                 {
                     target = creep.room.storage;
+                    
+                    if (!target)
+                    {
+                        target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                            filter: (structure) => {
+                                return (structure.structureType == STRUCTURE_SPAWN);
+                            }
+                        });
+                    }
                 }
             }
+            
 
             if(creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(target);

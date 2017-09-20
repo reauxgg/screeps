@@ -3,17 +3,30 @@ var hCap = 2;
 var bCap = 2;
 var rCap = 1;
 var uCap = 2;
-var cCap = 3;
+var cCap = 4;
 var dCap = 0;
 
-//var body = [WORK,CARRY,MOVE];
-//var body = [WORK,WORK,WORK,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE];
-var maxBody = [MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,
-               WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,
-	       CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY];
-var body = maxBody;//[WORK,WORK,WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE];
+var body200 = [WORK, CARRY,MOVE];
+var body550 = [WORK,WORK,WORK,
+                CARRY,CARRY,
+                MOVE,MOVE,MOVE];
+
+var body800 = [WORK,WORK,WORK,
+                CARRY,CARRY,CARRY,CARRY,CARRY,
+                MOVE,MOVE,MOVE,MOVE,MOVE];
+
+var body1300 =  [WORK,WORK,WORK,WORK,WORK,
+                 CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,
+                 MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE];
+
+var body2000 =  [MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,
+                 WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,
+	             CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY];
+var body = body1300;
+var maxBody = body; 
+//var body = maxBody;//[WORK,WORK,WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE];
 //var claimBody = [WORK,WORK,WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE];
-var claimBody = [WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE];
+var claimBody = body1300;
 var healer = [HEAL,HEAL,MOVE,MOVE,MOVE,MOVE];
 var fighter = [RANGED_ATTACK, RANGED_ATTACK, MOVE,MOVE,MOVE,MOVE];
 var defender = [ATTACK, ATTACK, MOVE,MOVE];
@@ -53,7 +66,7 @@ module.exports.loop = function () {
 
 //These need to be adjusted at the start of a room to WORK,CARRY,MOVE
     console.log('-------------------------');
-    console.log('Pop:' + population + ' H:' + harvesters.length + '/' + hCap + ' R:' + repairers.length + '/' + rCap + ' B:' + builders.length + '/' + bCap + ' U:' + upgraders.length + '/' + uCap +  ' C:' + claimers.length +'/'+cCap + '... Enrgy:' + TotalEnergy + '/' + MaxEnergy);
+    console.log('Pop:' + population + ' H:' + harvesters.length + '/' + hCap + ' R:' + repairers.length + '/' + rCap + ' B:' + builders.length + '/' + bCap + ' U:' + upgraders.length + '/' + uCap +  ' C:' + claimers.length +'/'+cCap + " D:" + defenders.length +'/'+dCap + '... Enrgy:' +  TotalEnergy + '/' + MaxEnergy);
     console.log('Claimers: ' + claimers);
 
     var newName = '';
@@ -79,14 +92,14 @@ module.exports.loop = function () {
         Memory.cNum++;
     }
     else if (claimers.length < cCap) {
-        newName = Game.spawns.Spawn2.createCreep(claimBody, 'C' + Memory.cNum, {role: 'claimer'});
+        newName = Game.spawns.Spawn1.createCreep(claimBody, 'C' + Memory.cNum, {role: 'claimer'});
         console.log('Spawning new claimer: ' + newName);
         Memory.cNum++;
     }
 
     if (defenders.length < dCap)
     {
-        newName = Game.spawns.Spawn2.createCreep(defender, 'D' + Memory.cNum, {role: 'defender'});
+        newName = Game.spawns.Spawn1.createCreep(defender, 'D' + Memory.cNum, {role: 'defender'});
         console.log('Spawning new defender: ' + newName);
         Memory.cNum++;
     }
@@ -95,6 +108,7 @@ module.exports.loop = function () {
 //Telling each creep what to do
     for (var creepname in Game.creeps) {
         var creep = Game.creeps[creepname];
+        
         if (creep.memory.role == 'harvester') {
             roleHarvester.run(creep);
         }
@@ -114,11 +128,10 @@ module.exports.loop = function () {
     }
 
 //Tower defense
-
     var towers1 = Room.find(FIND_STRUCTURES, {
         filter: (s) => s.structureType == STRUCTURE_TOWER
     });
-    var towers2 = Game.rooms.W22S49.find(FIND_STRUCTURES, {
+    var towers2 = Game.rooms.W8N3.find(FIND_STRUCTURES, {
         filter: (s) => s.structureType == STRUCTURE_TOWER
     });
     var towers = towers1.concat(towers2);
