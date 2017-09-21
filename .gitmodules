@@ -1,0 +1,3 @@
+[submodule "Lotus"]
+	path = Lotus
+	url = git@github.com:Zim104/LotusProject.git
